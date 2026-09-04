@@ -1,0 +1,403 @@
+{
+  "requests": [
+    {
+      "title": "Our neighborhood solidarity kitchen in Brooklyn Initiative",
+      "description": "Supplying fresh food baskets to families affected by grocery store closures.",
+      "authorName": "E2E Test Organizer",
+      "authorRole": "Community Lead",
+      "location": "Brooklyn, New York, USA",
+      "category": "Food & Nutrition",
+      "unTheme": "Ethical Giving",
+      "urgency": "urgent",
+      "status": "fulfilled",
+      "targetAmountSOL": 3.5,
+      "raisedAmountSOL": 0.25,
+      "donorCount": 1,
+      "itemsNeeded": [
+        {
+          "id": "item-1788537407800-1",
+          "name": "Essential Support Care Packages",
+          "quantity": 20,
+          "unit": "packages",
+          "fulfilled": true,
+          "estimatedCostUSD": 600
+        }
+      ],
+      "voiceNarrationText": "Hello community. We are asking with full transparency: Our neighborhood solidarity kitchen in Brooklyn needs 40 fresh vegetable crates and 20 insulated soup carriers for elderly residents.. Every micro-grant directly helps us purchase and deliver these items to our neighbors.",
+      "audioDurationSec": 20,
+      "imageUrl": "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1000&q=80",
+      "tags": [
+        "E2E-Test",
+        "Solidarity"
+      ],
+      "id": "req-1788537407807",
+      "createdAt": "2026-09-04T15:56:47.807Z",
+      "verifiedProofImageUrl": "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=800&q=80",
+      "proofNotes": "Delivered 40 fresh vegetable crates to Brooklyn community center. Received signed receipt.",
+      "proofConfidenceScore": 97
+    },
+    {
+      "id": "req-001",
+      "title": "Warm Winter Coats & Thermal Boots for Ward 4 Children",
+      "description": "Temperatures in northern Detroit are expected to drop below freezing next week. Our grassroots community youth center is providing 35 elementary school children with warm winter jackets, waterproof boots, and thermal gloves so they can safely walk to school and play outdoors.",
+      "authorName": "Marcus Vance",
+      "authorRole": "Community Youth Director",
+      "location": "Detroit, Michigan, USA",
+      "coordinates": {
+        "lat": 42.3314,
+        "lng": -83.0458
+      },
+      "category": "Shelter & Warmth",
+      "unTheme": "Equity & Inclusion",
+      "urgency": "urgent",
+      "status": "active",
+      "targetAmountSOL": 4.5,
+      "raisedAmountSOL": 3.2,
+      "donorCount": 18,
+      "itemsNeeded": [
+        {
+          "id": "i-1",
+          "name": "Youth Insulated Parkas (Sizes S-L)",
+          "quantity": 35,
+          "unit": "coats",
+          "fulfilled": true,
+          "estimatedCostUSD": 1400
+        },
+        {
+          "id": "i-2",
+          "name": "Waterproof Winter Boots",
+          "quantity": 35,
+          "unit": "pairs",
+          "fulfilled": false,
+          "estimatedCostUSD": 1050
+        },
+        {
+          "id": "i-3",
+          "name": "Thermal Glove & Beanie Sets",
+          "quantity": 50,
+          "unit": "sets",
+          "fulfilled": true,
+          "estimatedCostUSD": 500
+        }
+      ],
+      "voiceNarrationText": "Hello neighbors. Winter hits hard here on the north side, and no 8-year-old should ever have to wait at a snowy bus stop in just a hoodie. With your generous micro-grants and supply drops, we've already secured 35 parkas. We just need boots to keep these young feet dry and warm.",
+      "audioDurationSec": 24,
+      "imageUrl": "https://images.unsplash.com/photo-1543083477-4f785aeafaa9?auto=format&fit=crop&w=1000&q=80",
+      "createdAt": "2026-09-02T10:15:00Z",
+      "tags": [
+        "Youth",
+        "Winter Relief",
+        "School Aid",
+        "Grassroots"
+      ]
+    },
+    {
+      "id": "req-002",
+      "title": "Emergency Solar Backup Battery for Appalachian Mountain Clinic",
+      "description": "Following severe flash flooding that damaged grid infrastructure in Eastern Kentucky, our volunteer-run rural clinic requires a portable 2.4kWh LiFePO4 solar generator to keep insulin, pediatric antibiotics, and nebulizers continuously chilled during prolonged outages.",
+      "authorName": "Dr. Clara Higgins",
+      "authorRole": "Volunteer Physician & Nurse Lead",
+      "location": "Hazard, Kentucky, USA",
+      "coordinates": {
+        "lat": 37.2498,
+        "lng": -83.1932
+      },
+      "category": "Healthcare & Medicine",
+      "unTheme": "Climate & Poverty",
+      "urgency": "urgent",
+      "status": "active",
+      "targetAmountSOL": 6.8,
+      "raisedAmountSOL": 5.1,
+      "donorCount": 31,
+      "itemsNeeded": [
+        {
+          "id": "i-4",
+          "name": "Portable LiFePO4 Solar Power Station (2400Wh)",
+          "quantity": 1,
+          "unit": "unit",
+          "fulfilled": true,
+          "estimatedCostUSD": 1600
+        },
+        {
+          "id": "i-5",
+          "name": "Foldable 400W Solar Panels",
+          "quantity": 2,
+          "unit": "panels",
+          "fulfilled": false,
+          "estimatedCostUSD": 700
+        },
+        {
+          "id": "i-6",
+          "name": "Medical Cold-Chain Thermometer Sensors",
+          "quantity": 4,
+          "unit": "sensors",
+          "fulfilled": true,
+          "estimatedCostUSD": 240
+        }
+      ],
+      "voiceNarrationText": "When the creeks rise and power lines snap across these hollows, refrigerated insulin spoils within 36 hours. Our little clinic is the only medical post within 40 miles. Having portable solar backup isn't a luxury—it keeps our diabetic elders alive through the flood recovery.",
+      "audioDurationSec": 28,
+      "imageUrl": "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1000&q=80",
+      "createdAt": "2026-09-03T08:30:00Z",
+      "tags": [
+        "Flood Relief",
+        "Medical Aid",
+        "Clean Energy",
+        "Rural Health"
+      ]
+    },
+    {
+      "id": "req-003",
+      "title": "Refurbished Laptops for First-Generation Girls STEM Academy",
+      "description": "We run an intensive 12-week coding and electronics workshop for 24 high-school girls in Nairobi informal settlements. We are sourcing certified refurbished laptops and microcontroller starter kits to equip each student with their own learning workstation.",
+      "authorName": "Amina Omondi",
+      "authorRole": "Founder & Tech Educator",
+      "location": "Nairobi, Kenya",
+      "coordinates": {
+        "lat": -1.2921,
+        "lng": 36.8219
+      },
+      "category": "Education & Tech",
+      "unTheme": "Youth Leadership",
+      "urgency": "moderate",
+      "status": "active",
+      "targetAmountSOL": 7.2,
+      "raisedAmountSOL": 4.8,
+      "donorCount": 26,
+      "itemsNeeded": [
+        {
+          "id": "i-7",
+          "name": "Refurbished ThinkPad Laptops (Core i5/16GB)",
+          "quantity": 12,
+          "unit": "laptops",
+          "fulfilled": false,
+          "estimatedCostUSD": 2400
+        },
+        {
+          "id": "i-8",
+          "name": "ESP32 IoT & Robotics Starter Packs",
+          "quantity": 24,
+          "unit": "kits",
+          "fulfilled": true,
+          "estimatedCostUSD": 720
+        },
+        {
+          "id": "i-9",
+          "name": "6-Month High-Speed Mesh WiFi Subsidy",
+          "quantity": 1,
+          "unit": "service",
+          "fulfilled": true,
+          "estimatedCostUSD": 360
+        }
+      ],
+      "voiceNarrationText": "Talent is everywhere, but hardware is not. When you put a code terminal in the hands of a curious 16-year-old girl, she doesn't just learn Python—she builds flood sensors and agricultural trackers for her own neighborhood. Your generosity directly sparks the next generation of African innovators.",
+      "audioDurationSec": 26,
+      "imageUrl": "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1000&q=80",
+      "createdAt": "2026-09-01T14:20:00Z",
+      "tags": [
+        "Girls In Tech",
+        "STEM",
+        "Digital Inclusion",
+        "Education"
+      ]
+    },
+    {
+      "id": "req-004",
+      "title": "Fresh Farm Produce Rescue & Community Solidarity Kitchen",
+      "description": "Every Saturday, our team rescues 800+ lbs of surplus organic vegetables from regional farmers that would otherwise be discarded. We cook 250 hot, nutritious plant-forward meals and distribute fresh grocery boxes directly to low-income families and unhoused neighbors.",
+      "authorName": "Elena Rostova",
+      "authorRole": "Food Sovereignty Coordinator",
+      "location": "Oakland, California, USA",
+      "coordinates": {
+        "lat": 37.8044,
+        "lng": -122.2712
+      },
+      "category": "Food & Nutrition",
+      "unTheme": "Ethical Giving",
+      "urgency": "ongoing",
+      "status": "active",
+      "targetAmountSOL": 3.5,
+      "raisedAmountSOL": 3.5,
+      "donorCount": 42,
+      "itemsNeeded": [
+        {
+          "id": "i-10",
+          "name": "Commercial Grade Stainless Food Warmers",
+          "quantity": 2,
+          "unit": "units",
+          "fulfilled": true,
+          "estimatedCostUSD": 600
+        },
+        {
+          "id": "i-11",
+          "name": "Compostable Takeout Meal Containers",
+          "quantity": 1000,
+          "unit": "boxes",
+          "fulfilled": true,
+          "estimatedCostUSD": 350
+        },
+        {
+          "id": "i-12",
+          "name": "Refrigerated Cargo Van Fuel Grant (Month)",
+          "quantity": 1,
+          "unit": "grant",
+          "fulfilled": true,
+          "estimatedCostUSD": 450
+        }
+      ],
+      "voiceNarrationText": "Food waste is a moral failure when families are going to bed hungry two blocks away. We bridge that gap with dignifying, home-cooked hot meals and zero bureaucracy. We thank every generous soul who funded our fuel and warmers this month—we are 100% funded!",
+      "audioDurationSec": 22,
+      "imageUrl": "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1000&q=80",
+      "createdAt": "2026-08-30T11:00:00Z",
+      "tags": [
+        "Food Rescue",
+        "Zero Waste",
+        "Solidarity Kitchen",
+        "Nutrition"
+      ]
+    },
+    {
+      "id": "req-005",
+      "title": "Tactile Audio Learning Kits & Refreshable Braille Tablets",
+      "description": "Providing blind and visually impaired children in under-resourced public school districts with specialized tactile audio tablets, 3D printed topographic maps, and audio-described science kits to ensure equal classroom participation.",
+      "authorName": "Samira Chen",
+      "authorRole": "Assistive Tech Specialist",
+      "location": "Austin, Texas, USA",
+      "coordinates": {
+        "lat": 30.2672,
+        "lng": -97.7431
+      },
+      "category": "Education & Tech",
+      "unTheme": "Equity & Inclusion",
+      "urgency": "moderate",
+      "status": "active",
+      "targetAmountSOL": 5.4,
+      "raisedAmountSOL": 2.1,
+      "donorCount": 14,
+      "itemsNeeded": [
+        {
+          "id": "i-13",
+          "name": "Portable Tactile Audio Keyboards",
+          "quantity": 6,
+          "unit": "devices",
+          "fulfilled": false,
+          "estimatedCostUSD": 1800
+        },
+        {
+          "id": "i-14",
+          "name": "3D Printed Tactile Science Anatomy Models",
+          "quantity": 12,
+          "unit": "sets",
+          "fulfilled": true,
+          "estimatedCostUSD": 480
+        },
+        {
+          "id": "i-15",
+          "name": "Bone Conduction Learning Headsets",
+          "quantity": 8,
+          "unit": "headsets",
+          "fulfilled": false,
+          "estimatedCostUSD": 640
+        }
+      ],
+      "voiceNarrationText": "Imagine sitting in a science classroom where the teacher points at a diagram on the whiteboard, and you can only listen to silence. Tactile models and audio descriptions unlock the universe for visually impaired kids. Every small pledge helps us put these sensory tools into little hands.",
+      "audioDurationSec": 25,
+      "imageUrl": "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1000&q=80",
+      "createdAt": "2026-09-02T16:45:00Z",
+      "tags": [
+        "Accessibility",
+        "Braille",
+        "Visual Impairment",
+        "Assistive Tech"
+      ]
+    },
+    {
+      "id": "req-006",
+      "title": "Volunteer Cargo Bike Courier Network for Isolated Seniors",
+      "description": "Our youth volunteer cargo-cyclists deliver essential medications, heating oil vouchers, and fresh groceries to elderly, mobility-impaired residents living alone in high-rise council estates.",
+      "authorName": "Oliver Wright",
+      "authorRole": "Community Dispatcher",
+      "location": "Leeds, West Yorkshire, UK",
+      "coordinates": {
+        "lat": 53.8008,
+        "lng": -1.5491
+      },
+      "category": "Community Tools",
+      "unTheme": "Tech-Driven Giving",
+      "urgency": "ongoing",
+      "status": "fulfilled",
+      "targetAmountSOL": 2.8,
+      "raisedAmountSOL": 2.8,
+      "donorCount": 22,
+      "itemsNeeded": [
+        {
+          "id": "i-16",
+          "name": "Heavy-Duty Cargo Bike Trailer",
+          "quantity": 2,
+          "unit": "trailers",
+          "fulfilled": true,
+          "estimatedCostUSD": 800
+        },
+        {
+          "id": "i-17",
+          "name": "Insulated Medicine Delivery Panniers",
+          "quantity": 4,
+          "unit": "bags",
+          "fulfilled": true,
+          "estimatedCostUSD": 320
+        }
+      ],
+      "voiceNarrationText": "For many of our elderly neighbors, our volunteer courier is the only friendly voice they hear all week. Thanks to the EchoKind community, our cargo trailers were completely funded! We delivered 84 grocery packages and prescriptions in the last 7 days alone.",
+      "audioDurationSec": 21,
+      "imageUrl": "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1000&q=80",
+      "verifiedProofImageUrl": "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=800&q=80",
+      "proofNotes": "All 2 cargo trailers delivered and assembled. First 84 deliveries logged and verified on-chain.",
+      "proofConfidenceScore": 98,
+      "createdAt": "2026-08-25T09:00:00Z",
+      "tags": [
+        "Senior Care",
+        "Cargo Bikes",
+        "Mutual Aid",
+        "Loneliness Relief"
+      ]
+    }
+  ],
+  "grants": [
+    {
+      "requestId": "req-1788537407807",
+      "requestTitle": "Our neighborhood solidarity kitchen in Brooklyn Initiative",
+      "donorName": "E2E Generous Donor",
+      "amountSOL": 0.25,
+      "amountUSD": 36.25,
+      "txSignature": "5KindTestSig0i90nkc3zml7DevnetVerifiable",
+      "message": "Automated end-to-end test grant in solidarity.",
+      "id": "grant-1788537407826",
+      "timestamp": "2026-09-04T15:56:47.826Z",
+      "isEscrowLocked": false
+    },
+    {
+      "id": "grant-init-1",
+      "requestId": "req-001",
+      "requestTitle": "Warm Winter Coats & Thermal Boots for Ward 4 Children",
+      "donorName": "Anonymous Giver",
+      "amountSOL": 0.5,
+      "amountUSD": 72.5,
+      "txSignature": "4ZgK81mPvB93tLx52fQkMwez99xV82fL81h8x19w848k29291m101928374650192837465910283746501928374",
+      "timestamp": "2026-09-03T18:40:00Z",
+      "message": "Stay warm kids!",
+      "isEscrowLocked": true
+    },
+    {
+      "id": "grant-init-2",
+      "requestId": "req-002",
+      "requestTitle": "Emergency Solar Backup Battery for Appalachian Mountain Clinic",
+      "donorName": "SolarHope Guild",
+      "amountSOL": 1,
+      "amountUSD": 145,
+      "txSignature": "3YhL92nPwA82sKx41ePjLvdz88wU71eK70g7w08v737j18180l091827364509182736458009172635490817263",
+      "timestamp": "2026-09-03T21:10:00Z",
+      "message": "Keep that medicine cold. You are heroes.",
+      "isEscrowLocked": true
+    }
+  ]
+}

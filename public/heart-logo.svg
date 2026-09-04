@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="50%" stop-color="#EC4899" />
+      <stop offset="100%" stop-color="#8B5CF6" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <circle cx="24" cy="24" r="22" fill="#0F172A" stroke="url(#g1)" stroke-width="2" />
+  <!-- Heart wave icon -->
+  <path d="M24 37s-13-8.2-13-17.5C11 14.5 15 11 19.5 11c2.8 0 5.2 1.3 6.5 3.4 1.3-2.1 3.7-3.4 6.5-3.4C37 11 41 14.5 41 19.5 41 28.8 24 37 24 37z" 
+        fill="url(#g1)" filter="url(#glow)" opacity="0.9" />
+  <!-- Soundwave pulse inside heart -->
+  <path d="M17 21v4M21 18v10M24 16v14M27 18v10M31 21v4" 
+        stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+</svg>
