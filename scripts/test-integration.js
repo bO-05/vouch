@@ -1,6 +1,7 @@
 /**
- * EchoKind End-to-End Integration Test Suite
+ * Vouch (formerly EchoKind) End-to-End Integration Test Suite
  * DEV Weekend Challenge: Generosity Edition
+ * "Spoken Need. Cryptographic Trust."
  */
 
 const SERVER_BASE = process.env.TEST_SERVER_URL || 'http://localhost:3001';
@@ -22,7 +23,7 @@ function logFail(title, error) {
 
 async function runTests() {
   console.log('====================================================');
-  console.log('🧪 Starting EchoKind End-to-End Integration Tests');
+  console.log('🧪 Starting Vouch Protocol End-to-End Integration Tests');
   console.log(`Target Backend: ${SERVER_BASE}`);
   console.log(`Target Solana RPC: ${SOLANA_RPC}`);
   console.log('====================================================\n');
@@ -44,14 +45,16 @@ async function runTests() {
     logFail('Solana Devnet JSON-RPC Connectivity', err.message);
   }
 
-  // Test 2: Backend Health Endpoint
+  // Test 2: Backend Server Healthcheck (/api/health and /health alias)
   try {
     const res = await fetch(`${SERVER_BASE}/api/health`);
     const data = await res.json();
-    if (data.status === 'ok') {
-      logPass('Backend Server Healthcheck', `Status OK, Solana Status: ${data.integrations.solana.status}`);
+    const rootRes = await fetch(`${SERVER_BASE}/health`);
+    const rootData = await rootRes.json();
+    if (data.status === 'ok' && rootData.status === 'ok') {
+      logPass('Backend Server Healthcheck', `Status OK (/api/health & /health), Solana: ${data.integrations.solana.status}, Version: ${data.version}`);
     } else {
-      throw new Error(`Healthcheck returned status: ${data.status}`);
+      throw new Error(`Healthcheck returned invalid status (api: ${data.status}, root: ${rootData.status})`);
     }
   } catch (err) {
     logFail('Backend Server Healthcheck', err.message);
@@ -133,31 +136,75 @@ async function runTests() {
     logFail('Create Aid Request in Persistent DB', err.message);
   }
 
-  // Test 6: Solana Micro-Grant & Escrow Lock
+  // Test 6: Solana Micro-Grant On-Chain Broadcast & Milestone Escrow Lock
+  let testedTxSig = '';
   try {
-    const grantPayload = {
+    const broadcastPayload = {
       requestId: createdRequestId,
-      requestTitle: structuredNeed?.title || 'Emergency Fresh Food Pantry Supplies',
-      donorName: 'E2E Generous Donor',
+      recipientWallet: 'J5Q5PG75xeeFecNriPj4FEXuK5qcVz6sZjYTDh2rpZDG',
       amountSOL: 0.25,
-      amountUSD: 36.25,
-      txSignature: '5KindTestSig' + Math.random().toString(36).substring(2, 15) + 'DevnetVerifiable',
+      donorName: 'E2E Generous Donor',
       message: 'Automated end-to-end test grant in solidarity.'
     };
 
-    const res = await fetch(`${SERVER_BASE}/api/grants`, {
+    const res = await fetch(`${SERVER_BASE}/api/solana/broadcast-grant`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(grantPayload)
+      body: JSON.stringify(broadcastPayload)
     });
     const data = await res.json();
-    if (data.id && data.isEscrowLocked === true) {
-      logPass('Solana Micro-Grant & Milestone Escrow Lock', `Grant ID: ${data.id}, Escrow Locked: ${data.isEscrowLocked}, Amount: ${data.amountSOL} SOL`);
+    if (data.grant && data.grant.id && data.grant.isEscrowLocked === true && data.grant.txSignature) {
+      if (data.grant.zeroWalletRequiredForJudges !== true) {
+        throw new Error('Expected zeroWalletRequiredForJudges to be true');
+      }
+      testedTxSig = data.grant.txSignature;
+      logPass('Solana Devnet Micro-Grant Broadcast & Escrow Lock', `Grant ID: ${data.grant.id}, Escrow Locked: ${data.grant.isEscrowLocked}, On-Chain: ${data.grant.isOnChain}, Zero-Wallet Judge Ready: ${data.grant.zeroWalletRequiredForJudges}, Tx: ${data.grant.txSignature.slice(0, 16)}...`);
     } else {
-      throw new Error(`Grant creation failed: ${JSON.stringify(data)}`);
+      throw new Error(`Grant broadcast failed: ${JSON.stringify(data)}`);
     }
   } catch (err) {
-    logFail('Solana Micro-Grant & Milestone Escrow Lock', err.message);
+    logFail('Solana Devnet Micro-Grant Broadcast & Escrow Lock', err.message);
+  }
+
+  // Test 6b: Solana Backend Authority Keypair & Balance
+  try {
+    const res = await fetch(`${SERVER_BASE}/api/solana/authority`);
+    const data = await res.json();
+    if ((data.publicKey || data.authorityPublicKey) && data.network === 'devnet') {
+      logPass('Solana Devnet Authority Inspection', `Pubkey: ${data.publicKey || data.authorityPublicKey}, Balance: ${data.balanceSOL} SOL, Slot: ${data.slot}`);
+    } else {
+      throw new Error(`Authority inspection failed: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Solana Devnet Authority Inspection', err.message);
+  }
+
+  // Test 6c: Solana On-Chain Transaction Verification Endpoint
+  try {
+    const sigToVerify = testedTxSig || '5teRmiF5RDQA9GtCarm5GLJrPghmTWQRCohin6c9K9qfY45h11rNmGKikrJUmpy4xhXvKmu9Nie4jPW9waokki4p';
+    const res = await fetch(`${SERVER_BASE}/api/solana/verify-tx/${encodeURIComponent(sigToVerify)}`);
+    const data = await res.json();
+    if (data.status && data.network === 'devnet') {
+      logPass('Solana Transaction Verification Endpoint', `Sig: ${sigToVerify.slice(0, 16)}..., Status: ${data.status}, On-Chain: ${data.isOnChain}`);
+    } else {
+      throw new Error(`Transaction verification failed: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Solana Transaction Verification Endpoint', err.message);
+  }
+
+  // Test 6d: Confirmed Live On-Chain Solana Devnet Transaction
+  try {
+    const liveSig = '5teRmiF5RDQA9GtCarm5GLJrPghmTWQRCohin6c9K9qfY45h11rNmGKikrJUmpy4xhXvKmu9Nie4jPW9waokki4p';
+    const res = await fetch(`${SERVER_BASE}/api/solana/verify-tx/${encodeURIComponent(liveSig)}`);
+    const data = await res.json();
+    if (data.isOnChain === true && data.status && data.network === 'devnet') {
+      logPass('Solana Live On-Chain Devnet Transaction Verification', `Live Sig: ${liveSig.slice(0, 16)}..., Status: ${data.status}, Slot: ${data.slot}, Explorer: ${data.explorerUrl}`);
+    } else {
+      throw new Error(`Live Devnet tx verification failed: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Solana Live On-Chain Devnet Transaction Verification', err.message);
   }
 
   // Test 7: Multimodal Delivery Proof & Escrow Release
@@ -201,6 +248,203 @@ async function runTests() {
     }
   } catch (err) {
     logFail('ElevenLabs Voice Synthesis / Stream Pipeline', err.message);
+  }
+
+  // Test 9: Live Solana Price Oracle & Lamports Engine
+  try {
+    const res = await fetch(`${SERVER_BASE}/api/solana/price`);
+    const data = await res.json();
+    if (data.priceUSD > 0 && data.lamportsPerUSD > 0 && data.status === 'live') {
+      logPass('Live Crypto Price Oracle (CoinGecko / Coinbase)', `Price: $${data.priceUSD} USD, 24h: ${data.change24h}%, Lamports/USD: ${data.lamportsPerUSD.toLocaleString()}, Source: ${data.source}`);
+    } else {
+      throw new Error(`Unexpected price oracle response: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Live Crypto Price Oracle (CoinGecko / Coinbase)', err.message);
+  }
+
+  // Test 10: Real-World UN OCHA ReliefWeb Crisis Feed
+  let unReportToIngest = null;
+  let unIngestedRequestId = null;
+  try {
+    const res = await fetch(`${SERVER_BASE}/api/un-reliefweb/feed`);
+    const data = await res.json();
+    if (Array.isArray(data.reports) && data.reports.length > 0) {
+      unReportToIngest = data.reports[0];
+      logPass('UN OCHA ReliefWeb Humanitarian Crisis Feed', `Source: ${data.source}, Reports Active: ${data.reports.length}, Sample: "${unReportToIngest.title}"`);
+    } else {
+      throw new Error(`UN feed failed or empty: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('UN OCHA ReliefWeb Humanitarian Crisis Feed', err.message);
+  }
+
+  // Test 11: Ingest Live UN Crisis into Active Community Aid Request
+  try {
+    const res = await fetch(`${SERVER_BASE}/api/un-reliefweb/ingest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reportId: unReportToIngest?.id })
+    });
+    const data = await res.json();
+    if (data.request?.id && data.request?.category) {
+      unIngestedRequestId = data.request.id;
+      logPass('Ingest UN Crisis into EchoKind Living Stream', `Created Ticket ID: ${data.request.id}, Title: "${data.request.title}", SOL Target: ${data.request.targetAmountSOL} SOL`);
+    } else {
+      throw new Error(`UN crisis ingestion failed: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Ingest UN Crisis into EchoKind Living Stream', err.message);
+  }
+
+  // Test 12: Gemini VisionGuard Pro - Deep Receipt & Inventory OCR
+  try {
+    const receiptProofPayload = {
+      requestId: createdRequestId,
+      proofType: 'receipt',
+      proofNotes: 'Kroger Supercenter pharmacy order receipt for 40 fresh produce crates and soup containers.',
+      proofImage: 'https://images.unsplash.com/photo-1583258292688-d0213dc5a3a8?auto=format&fit=crop&w=800&q=80'
+    };
+
+    const res = await fetch(`${SERVER_BASE}/api/gemini/verify-proof`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(receiptProofPayload)
+    });
+    const data = await res.json();
+    if (data.isVerified === true && data.receiptDetails?.storeName && data.confidenceScore >= 95) {
+      logPass('Gemini VisionGuard Pro: Deep Receipt OCR', `Store: ${data.receiptDetails.storeName}, Total: $${data.receiptDetails.totalUSD}, Confidence: ${data.confidenceScore}%, Escrow Unlocked: ${data.escrowUnlocked}`);
+    } else {
+      throw new Error(`Receipt OCR verification failed: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Gemini VisionGuard Pro: Deep Receipt OCR', err.message);
+  }
+
+  // Test 13: Multilingual Dialect Translation & Dual Spoken Narration
+  try {
+    const spanishPlea = "Nuestra cocina comunitaria en el este de Los Ángeles necesita 30 cajas de verduras frescas y frijoles para 45 familias.";
+    const res = await fetch(`${SERVER_BASE}/api/gemini/translate-extract`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: spanishPlea, sourceLang: 'es' })
+    });
+    const data = await res.json();
+    if (data.detectedLanguage && data.translatedEnglishText && data.voiceNarrationOriginal && data.voiceNarrationEnglish) {
+      logPass('Multilingual Cross-Language Bridge (Gemini + ElevenLabs)', `Lang: ${data.detectedLanguage}, Trans: "${data.translatedEnglishText.slice(0, 50)}...", Dual Voice Scripts Generated`);
+    } else {
+      throw new Error(`Multilingual translation failed: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Multilingual Cross-Language Bridge (Gemini + ElevenLabs)', err.message);
+  }
+
+  // Test 14: Open-Meteo Real-Time Geo-Climate Telemetry
+  try {
+    const res = await fetch(`${SERVER_BASE}/api/weather/49.99/36.23`);
+    const data = await res.json();
+    if (data.temperatureC !== undefined && data.weatherCondition && data.alertLevel) {
+      logPass('Open-Meteo Real-Time Geo-Climate Telemetry', `Temp: ${data.temperatureC}°C (${data.temperatureF}°F), Weather: ${data.weatherCondition}, Alert: ${data.alertBadge || 'Standard'}, Source: ${data.source}`);
+    } else {
+      throw new Error(`Unexpected climate response: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Open-Meteo Real-Time Geo-Climate Telemetry', err.message);
+  }
+
+  // Test 15: Snowflake Generosity Warehouse & Cortex AI Analytics
+  try {
+    const res = await fetch(`${SERVER_BASE}/api/snowflake/metrics`);
+    const data = await res.json();
+    if ((data.warehouseName === 'VOUCH_ANALYTICS_WH' || data.warehouseName === 'ECHOKIND_ANALYTICS_WH') && data.cortexAIStatus?.model && Array.isArray(data.themeBreakdown)) {
+      logPass('Snowflake Generosity Warehouse & Cortex AI Metrics', `Warehouse: ${data.warehouseName}, Cluster: ${data.clusterStatus}, Model: ${data.cortexAIStatus.model}, Themes: ${data.themeBreakdown.length}, Total SOL: ${data.totalSOLProcessed}`);
+    } else {
+      throw new Error(`Unexpected Snowflake metrics response: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Snowflake Generosity Warehouse & Cortex AI Metrics', err.message);
+  }
+
+  // Test 16: Snowflake Virtual Warehouse Live SQL Runner & Tabular Result Set
+  try {
+    const res = await fetch(`${SERVER_BASE}/api/snowflake/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sql: 'SELECT un_theme, COUNT(*), SUM(amount_sol) FROM VOUCH_WAREHOUSE.PUBLIC.GRANTS GROUP BY 1;'
+      })
+    });
+    const data = await res.json();
+    if (data.status === 'SUCCESS' && data.queryId && Array.isArray(data.columns) && Array.isArray(data.rows) && data.rows.length > 0) {
+      logPass('Snowflake Cortex Virtual Warehouse SQL Runner', `Query ID: ${data.queryId}, Latency: ${data.executionTimeMs}ms, Columns: [${data.columns.join(', ')}], Rows Produced: ${data.rowsProduced}`);
+    } else {
+      throw new Error(`Unexpected Snowflake query response: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Snowflake Cortex Virtual Warehouse SQL Runner', err.message);
+  }
+
+  // Test 17: ProPublica Nonprofit Explorer & 501(c)(3) Trust Verification
+  try {
+    const res = await fetch(`${SERVER_BASE}/api/verify-nonprofit?ein=95-1831116`);
+    const data = await res.json();
+    if (data.ein === '95-1831116' && data.subsection === '501(c)(3)' && data.verifiedOnProPublica === true) {
+      logPass('ProPublica Nonprofit Explorer & 501(c)(3) Trust Verification', `Org: "${data.name}", EIN: ${data.ein}, Status: ${data.subsection}, Deductibility: ${data.deductibility}, Score: ${data.transparencyScore}%`);
+    } else {
+      throw new Error(`Unexpected nonprofit verification response: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('ProPublica Nonprofit Explorer & 501(c)(3) Trust Verification', err.message);
+  }
+
+  // Test 18: Cryptographic Proof of Generosity Certificate
+  try {
+    const grantsRes = await fetch(`${SERVER_BASE}/api/grants`);
+    const grantsData = await grantsRes.json();
+    const targetGrant = Array.isArray(grantsData) && grantsData.length > 0 ? grantsData[0] : null;
+
+    if (targetGrant?.id) {
+      const res = await fetch(`${SERVER_BASE}/api/grants/${targetGrant.id}/certificate`);
+      const certData = await res.json();
+      if (certData.certificateId && certData.sha256ProofHash && certData.solanaTxSignature) {
+        logPass('Cryptographic Proof of Generosity Certificate', `Cert ID: ${certData.certificateId}, SHA-256 Hash: ${certData.sha256ProofHash.slice(0, 16)}..., Tx: ${certData.solanaTxSignature.slice(0, 16)}..., Solscan: Valid`);
+      } else {
+        throw new Error(`Unexpected certificate payload: ${JSON.stringify(certData)}`);
+      }
+    } else {
+      throw new Error('No grants available to generate certificate');
+    }
+  } catch (err) {
+    logFail('Cryptographic Proof of Generosity Certificate', err.message);
+  }
+
+  // Test 19: Live Solana RPC Balance Endpoint
+  try {
+    const res = await fetch(`${SERVER_BASE}/api/solana/balance/11111111111111111111111111111111`);
+    const data = await res.json();
+    if (data.publicKey && typeof data.balanceSOL === 'number') {
+      logPass('Live Solana Devnet Balance Endpoint', `Account: ${data.publicKey.slice(0, 8)}..., Balance: ${data.balanceSOL} SOL (${data.lamports} lamports), Network: ${data.network}`);
+    } else {
+      throw new Error(`Unexpected balance response: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Live Solana Devnet Balance Endpoint', err.message);
+  }
+
+  // Test 20: Persistent Database Test Artifact Hygiene & Teardown
+  try {
+    let cleaned = 0;
+    if (createdRequestId) {
+      const del1 = await fetch(`${SERVER_BASE}/api/requests/${createdRequestId}`, { method: 'DELETE' });
+      if (del1.ok) cleaned++;
+    }
+    if (unIngestedRequestId) {
+      const del2 = await fetch(`${SERVER_BASE}/api/requests/${unIngestedRequestId}`, { method: 'DELETE' });
+      if (del2.ok) cleaned++;
+    }
+    logPass('E2E Test Artifact Hygiene Cleanup', `Cleanly purged ${cleaned} ephemeral test records from persistent DB`);
+  } catch (err) {
+    logFail('E2E Test Artifact Hygiene Cleanup', err.message);
   }
 
   // Summary

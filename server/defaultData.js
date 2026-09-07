@@ -1,6 +1,9 @@
-import { AidRequest } from '../types';
+/**
+ * EchoKind Default Verified Community Aid Requests
+ * Used for automated self-healing & persistent database seeding
+ */
 
-export const INITIAL_AID_REQUESTS: AidRequest[] = [
+export const DEFAULT_AID_REQUESTS = [
   {
     id: 'req-001',
     title: 'Warm Winter Coats & Thermal Boots for Ward 4 Children',
@@ -117,17 +120,17 @@ export const INITIAL_AID_REQUESTS: AidRequest[] = [
     },
     category: 'Education & Tech',
     unTheme: 'Youth Leadership',
-    urgency: 'ongoing',
+    urgency: 'moderate',
     status: 'active',
-    targetAmountSOL: 4.2,
-    raisedAmountSOL: 1.8,
-    donorCount: 12,
+    targetAmountSOL: 7.2,
+    raisedAmountSOL: 4.8,
+    donorCount: 26,
     itemsNeeded: [
-      { id: 'i-7', name: 'Certified Refurbished ThinkPad Laptops', quantity: 12, unit: 'laptops', fulfilled: false, estimatedCostUSD: 1800 },
-      { id: 'i-8', name: 'Microcontroller Starter Component Packs', quantity: 24, unit: 'kits', fulfilled: true, estimatedCostUSD: 480 },
-      { id: 'i-9', name: 'Mobile Solar Battery Charger Stations', quantity: 4, unit: 'chargers', fulfilled: false, estimatedCostUSD: 360 }
+      { id: 'i-7', name: 'Refurbished ThinkPad Laptops (Core i5/16GB)', quantity: 12, unit: 'laptops', fulfilled: false, estimatedCostUSD: 2400 },
+      { id: 'i-8', name: 'ESP32 IoT & Robotics Starter Packs', quantity: 24, unit: 'kits', fulfilled: true, estimatedCostUSD: 720 },
+      { id: 'i-9', name: '6-Month High-Speed Mesh WiFi Subsidy', quantity: 1, unit: 'service', fulfilled: true, estimatedCostUSD: 360 }
     ],
-    voiceNarrationText: "In our settlement, talent is universally distributed, but opportunity is not. When you put a coding terminal and a micro-grant in the hands of a 16-year-old girl, she transforms her entire community. Help us get the remaining 12 laptops funded this semester.",
+    voiceNarrationText: "Talent is everywhere, but hardware is not. When you put a code terminal in the hands of a curious 16-year-old girl, she doesn't just learn Python—she builds flood sensors and agricultural trackers for her own neighborhood. Your generosity directly sparks the next generation of African innovators.",
     audioDurationSec: 26,
     imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1000&q=80',
     createdAt: '2026-09-01T14:20:00Z',
@@ -389,5 +392,79 @@ export const INITIAL_AID_REQUESTS: AidRequest[] = [
     imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1000&q=80',
     createdAt: '2026-09-04T15:30:00Z',
     tags: ['UkraineAid', 'WinterEmergency', 'Humanitarian', 'FreezeRelief']
+  }
+];
+
+export const DEVNET_VERIFIED_VAULTS = [
+  'J5Q5PG75xeeFecNriPj4FEXuK5qcVz6sZjYTDh2rpZDG',
+  'Dqv5yZzi8vN2TGsQ966CebKnsvBf12PXJEcvFTHdx1xu',
+  '2VyJghegXGD7rPxS5HzemSWWjv64N8v8bThJoMRmTeEs',
+  '7nuCn1x9RRGj9yhWPa8WwSVneJdMqU4tHHPsfdr3A17t',
+  'D4MKCKqZTABJzneg5JiMxg2RqkBhdwcPWny92uVNomyH',
+  '4aoR48sXEwyWEh9eUKzGV536CZzwSocHP5MAsX8WWJvD',
+  'Afoem182Bdp1HK2ntS6iQQWkx1Wd8MBFLD2nkGpaWQAq',
+  '6esP1E63SSeQsTkMAzqBB2YrZrLAD59PcwPhva89K1RX',
+  '4P8DizCXxQJFHWU7BHJztDcQpD9B2Qz9r7tD2u9qsVPG',
+  'CPDZcAs36XSyWQLqrkg3htNkHEpdLQ9GGyD6Fhgji2Wm',
+  'FfFF5M2HFYT6Uir5hYVCE4sCa5yBLGqf4ckCuSHTxvS1'
+];
+
+export const DEFAULT_GRANTS = [
+  {
+    id: "grant-e2e-seed-001",
+    requestId: "req-004",
+    requestTitle: "Fresh Farm Produce Rescue & Community Solidarity Kitchen",
+    donorName: "Elena & Global Solidarity Collective",
+    amountSOL: 0.5,
+    amountUSD: 51.15,
+    txSignature: "5teRmiF5RDQA9GtCarm5GLJrPghmTWQRCohin6c9K9qfY45h11rNmGKikrJUmpy4xhXvKmu9Nie4jPW9waokki4p",
+    slot: 494440484,
+    blockTime: 1788771448,
+    confirmationStatus: "confirmed",
+    isOnChain: true,
+    recipientWallet: "D4MKCKqZTABJzneg5JiMxg2RqkBhdwcPWny92uVNomyH",
+    explorerUrl: "https://explorer.solana.com/tx/5teRmiF5RDQA9GtCarm5GLJrPghmTWQRCohin6c9K9qfY45h11rNmGKikrJUmpy4xhXvKmu9Nie4jPW9waokki4p?cluster=devnet",
+    solscanUrl: "https://solscan.io/tx/5teRmiF5RDQA9GtCarm5GLJrPghmTWQRCohin6c9K9qfY45h11rNmGKikrJUmpy4xhXvKmu9Nie4jPW9waokki4p?cluster=devnet",
+    timestamp: "2026-09-07T08:57:28.308Z",
+    message: "Solidarity micro-grant for community organic vegetable distribution.",
+    isEscrowLocked: false
+  },
+  {
+    id: "grant-init-1",
+    requestId: "req-001",
+    requestTitle: "Warm Winter Coats & Thermal Boots for Ward 4 Children",
+    donorName: "Anonymous Giver",
+    amountSOL: 0.5,
+    amountUSD: 72.5,
+    txSignature: "bEQu49ziff6mr5xRTsPAMmuSeiG77bq5L1kbKFVk7j6pibR91p2s4p8LAmx1gA3WcgvWnEJunGqMGxAVc61sYXi",
+    slot: 494502603,
+    blockTime: 1788770700,
+    confirmationStatus: "confirmed",
+    isOnChain: true,
+    recipientWallet: "Dqv5yZzi8vN2TGsQ966CebKnsvBf12PXJEcvFTHdx1xu",
+    explorerUrl: "https://explorer.solana.com/tx/bEQu49ziff6mr5xRTsPAMmuSeiG77bq5L1kbKFVk7j6pibR91p2s4p8LAmx1gA3WcgvWnEJunGqMGxAVc61sYXi?cluster=devnet",
+    solscanUrl: "https://solscan.io/tx/bEQu49ziff6mr5xRTsPAMmuSeiG77bq5L1kbKFVk7j6pibR91p2s4p8LAmx1gA3WcgvWnEJunGqMGxAVc61sYXi?cluster=devnet",
+    timestamp: "2026-09-03T18:40:00Z",
+    message: "Stay warm kids!",
+    isEscrowLocked: true
+  },
+  {
+    id: "grant-init-2",
+    requestId: "req-002",
+    requestTitle: "Emergency Solar Backup Battery for Appalachian Mountain Clinic",
+    donorName: "SolarHope Guild",
+    amountSOL: 1,
+    amountUSD: 145,
+    txSignature: "5352WbH55nHWcVwmHokL97hg1FNBLLkUfMfCmwuceU46zPKcZmbGvpsp2jksSuwUEPQZDkgvyj3HbT3W1fpzGwH4",
+    slot: 494502602,
+    blockTime: 1788770695,
+    confirmationStatus: "confirmed",
+    isOnChain: true,
+    recipientWallet: "2VyJghegXGD7rPxS5HzemSWWjv64N8v8bThJoMRmTeEs",
+    explorerUrl: "https://explorer.solana.com/tx/5352WbH55nHWcVwmHokL97hg1FNBLLkUfMfCmwuceU46zPKcZmbGvpsp2jksSuwUEPQZDkgvyj3HbT3W1fpzGwH4?cluster=devnet",
+    solscanUrl: "https://solscan.io/tx/5352WbH55nHWcVwmHokL97hg1FNBLLkUfMfCmwuceU46zPKcZmbGvpsp2jksSuwUEPQZDkgvyj3HbT3W1fpzGwH4?cluster=devnet",
+    timestamp: "2026-09-03T21:10:00Z",
+    message: "Keep that medicine cold. You are heroes.",
+    isEscrowLocked: true
   }
 ];

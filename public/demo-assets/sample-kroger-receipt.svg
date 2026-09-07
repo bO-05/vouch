@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 640" width="100%" height="100%" style="font-family: 'Courier New', Courier, monospace; background: #FAF9F6;">
+  <defs>
+    <filter id="paperShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Paper background -->
+  <rect x="10" y="10" width="380" height="620" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" filter="url(#paperShadow)" />
+
+  <!-- Top serrated paper effect / header decor -->
+  <path d="M 10 10 L 25 18 L 40 10 L 55 18 L 70 10 L 85 18 L 100 10 L 115 18 L 130 10 L 145 18 L 160 10 L 175 18 L 190 10 L 205 18 L 220 10 L 235 18 L 250 10 L 265 18 L 280 10 L 295 18 L 310 10 L 325 18 L 340 10 L 355 18 L 370 10 L 390 10" fill="none" stroke="#CBD5E1" stroke-width="1" />
+
+  <!-- Store Brand -->
+  <g text-anchor="middle" fill="#0F172A">
+    <text x="200" y="52" font-size="19" font-weight="900" letter-spacing="1">KROGER COMMUNITY SUPERCENTER</text>
+    <text x="200" y="72" font-size="12" font-weight="700">STORE #492 • COMMUNITY RELIEF PARTNER</text>
+    <text x="200" y="88" font-size="10" fill="#475569">1088 FULTON ST, BROOKLYN, NY 11238</text>
+    <text x="200" y="103" font-size="10" fill="#475569">TEL: (718) 555-0199 • TAX EXEMPT EIN: 38-2940192</text>
+  </g>
+
+  <!-- Divider Line -->
+  <line x1="25" y1="118" x2="375" y2="118" stroke="#0F172A" stroke-width="1.5" stroke-dasharray="4 2" />
+
+  <!-- Transaction metadata -->
+  <g font-size="10.5" fill="#334155">
+    <text x="25" y="136">DATE: 2026-09-04 14:38:12</text>
+    <text x="250" y="136">REG: 04  OP: 88</text>
+    <text x="25" y="152">RECEIPT ID: KRG-492-984120</text>
+    <text x="250" y="152">STATUS: FULFILLED</text>
+    <text x="25" y="168">CLIENT: BROOKLYN SOLIDARITY KITCHEN</text>
+  </g>
+
+  <line x1="25" y1="180" x2="375" y2="180" stroke="#0F172A" stroke-width="1" />
+
+  <!-- Column Header -->
+  <g font-size="11" font-weight="700" fill="#0F172A">
+    <text x="25" y="196">QTY</text>
+    <text x="65" y="196">ITEM DESCRIPTION</text>
+    <text x="280" y="196">PRICE</text>
+    <text x="340" y="196" text-anchor="end">TOTAL</text>
+  </g>
+
+  <line x1="25" y1="204" x2="375" y2="204" stroke="#CBD5E1" stroke-width="1" />
+
+  <!-- Line Items -->
+  <g font-size="10.5" fill="#1E293B">
+    <!-- Item 1 -->
+    <text x="25" y="226" font-weight="700">40</text>
+    <text x="65" y="226">Fresh Organic Veg Crates (Bulk)</text>
+    <text x="280" y="226">$10.00</text>
+    <text x="375" y="226" text-anchor="end" font-weight="700">$400.00 T</text>
+    <text x="65" y="240" font-size="9" fill="#64748B">SKU: 011110-84920 [Produce / Mutual Aid]</text>
+
+    <!-- Item 2 -->
+    <text x="25" y="266" font-weight="700">20</text>
+    <text x="65" y="266">Insulated Soup Warmers/Carriers</text>
+    <text x="280" y="266">$8.50</text>
+    <text x="375" y="266" text-anchor="end" font-weight="700">$170.00 T</text>
+    <text x="65" y="280" font-size="9" fill="#64748B">SKU: 049281-22910 [Kitchen Equipment]</text>
+  </g>
+
+  <line x1="25" y1="300" x2="375" y2="300" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="2 2" />
+
+  <!-- Totals Section -->
+  <g font-size="12" fill="#0F172A">
+    <text x="25" y="322">SUBTOTAL (2 ITEMS, 60 UNITS):</text>
+    <text x="375" y="322" text-anchor="end" font-weight="700">$570.00</text>
+
+    <text x="25" y="342" fill="#16A34A">501(c)(3) TAX EXEMPTION (NY-38):</text>
+    <text x="375" y="342" text-anchor="end" fill="#16A34A" font-weight="700">-$0.00</text>
+
+    <line x1="25" y1="354" x2="375" y2="354" stroke="#0F172A" stroke-width="1.5" />
+
+    <text x="25" y="378" font-size="15" font-weight="900">BALANCE DUE / TOTAL:</text>
+    <text x="375" y="378" text-anchor="end" font-size="16" font-weight="900" fill="#047857">$570.00 USD</text>
+  </g>
+
+  <line x1="25" y1="395" x2="375" y2="395" stroke="#0F172A" stroke-width="1" />
+
+  <!-- Payment Info -->
+  <g font-size="10" fill="#475569">
+    <text x="25" y="414">PAYMENT METHOD: SOLANA DEVNET ESCROW CARD</text>
+    <text x="25" y="428">CARD: ************4920  AUTH: 981240</text>
+    <text x="25" y="442">ESCROW RELEASE TX: 5teRmiF5RDQA9GtCarm5GLJrPghmTWQRCohin6c9K9qfY45h11rNmGKikrJUmpy4xhXvKmu9Nie4jPW9waokki4p</text>
+  </g>
+
+  <!-- Gemini VisionGuard OCR Stamp Box -->
+  <rect x="25" y="460" width="350" height="60" rx="6" fill="#F0FDF4" stroke="#22C55E" stroke-width="1.5" stroke-dasharray="4 2" />
+  <g fill="#15803D" text-anchor="middle">
+    <text x="200" y="482" font-size="12" font-weight="900" letter-spacing="1">✓ GEMINI VISIONGUARD PRO OCR VERIFIED</text>
+    <text x="200" y="499" font-size="10" font-weight="700">98% INVENTORY MATCH • 2/2 LINE ITEMS RECONCILED</text>
+    <text x="200" y="512" font-size="9" fill="#16A34A">Solana Micro-Grant Escrow Funds Released to Organizer</text>
+  </g>
+
+  <!-- Barcode Representation -->
+  <g fill="#0F172A" transform="translate(45, 536)">
+    <!-- Simulated barcode vertical lines -->
+    <rect x="0" y="0" width="3" height="40" />
+    <rect x="5" y="0" width="2" height="40" />
+    <rect x="9" y="0" width="5" height="40" />
+    <rect x="17" y="0" width="2" height="40" />
+    <rect x="22" y="0" width="4" height="40" />
+    <rect x="29" y="0" width="1" height="40" />
+    <rect x="33" y="0" width="6" height="40" />
+    <rect x="42" y="0" width="2" height="40" />
+    <rect x="47" y="0" width="3" height="40" />
+    <rect x="53" y="0" width="5" height="40" />
+    <rect x="61" y="0" width="2" height="40" />
+    <rect x="66" y="0" width="4" height="40" />
+    <rect x="73" y="0" width="1" height="40" />
+    <rect x="77" y="0" width="6" height="40" />
+    <rect x="86" y="0" width="3" height="40" />
+    <rect x="92" y="0" width="2" height="40" />
+    <rect x="97" y="0" width="5" height="40" />
+    <rect x="105" y="0" width="2" height="40" />
+    <rect x="110" y="0" width="4" height="40" />
+    <rect x="117" y="0" width="1" height="40" />
+    <rect x="121" y="0" width="6" height="40" />
+    <rect x="130" y="0" width="2" height="40" />
+    <rect x="135" y="0" width="4" height="40" />
+    <rect x="142" y="0" width="2" height="40" />
+    <rect x="147" y="0" width="5" height="40" />
+    <rect x="155" y="0" width="3" height="40" />
+    <rect x="161" y="0" width="1" height="40" />
+    <rect x="165" y="0" width="6" height="40" />
+    <rect x="174" y="0" width="2" height="40" />
+    <rect x="179" y="0" width="4" height="40" />
+    <rect x="186" y="0" width="3" height="40" />
+    <rect x="192" y="0" width="5" height="40" />
+    <rect x="200" y="0" width="2" height="40" />
+    <rect x="205" y="0" width="4" height="40" />
+    <rect x="212" y="0" width="1" height="40" />
+    <rect x="216" y="0" width="6" height="40" />
+    <rect x="225" y="0" width="2" height="40" />
+    <rect x="230" y="0" width="5" height="40" />
+    <rect x="238" y="0" width="3" height="40" />
+    <rect x="244" y="0" width="2" height="40" />
+    <rect x="249" y="0" width="4" height="40" />
+    <rect x="256" y="0" width="2" height="40" />
+    <rect x="261" y="0" width="5" height="40" />
+    <rect x="269" y="0" width="3" height="40" />
+    <rect x="275" y="0" width="2" height="40" />
+    <rect x="280" y="0" width="4" height="40" />
+    <rect x="287" y="0" width="1" height="40" />
+    <rect x="291" y="0" width="6" height="40" />
+    <rect x="300" y="0" width="3" height="40" />
+    <rect x="306" y="0" width="4" height="40" />
+  </g>
+  <text x="200" y="590" font-size="9" text-anchor="middle" fill="#64748B">KRG-0492-8821-4920-OCR-PASS</text>
+
+  <!-- Footer slogan -->
+  <text x="200" y="612" font-size="10" font-weight="700" text-anchor="middle" fill="#0F172A">THANK YOU FOR SUPPORTING COMMUNITY SOLIDARITY!</text>
+</svg>

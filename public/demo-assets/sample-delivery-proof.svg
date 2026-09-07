@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" width="100%" height="100%" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0A0F1D;">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#10B981" />
+      <stop offset="100%" stopColor="#059669" />
+    </linearGradient>
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <!-- Card Background -->
+  <rect x="15" y="15" width="470" height="370" rx="14" fill="#0F172A" stroke="#1E293B" stroke-width="1.5" filter="url(#cardShadow)" />
+
+  <!-- Top Accent Bar -->
+  <rect x="15" y="15" width="470" height="8" rx="4" fill="url(#headerGrad)" />
+
+  <!-- Header Content -->
+  <g fill="#FFFFFF" transform="translate(35, 45)">
+    <rect x="0" y="0" width="34" height="34" rx="8" fill="rgba(16, 185, 129, 0.15)" stroke="rgba(16, 185, 129, 0.3)" />
+    <!-- Checkmark Icon in SVG -->
+    <path d="M 10 17 L 15 22 L 24 12" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="46" y="18" font-size="16" font-weight="800" letter-spacing="-0.02em">Community Mutual Aid Field Delivery Slip</text>
+    <text x="46" y="32" font-size="11" fill="#94A3B8">Official Volunteer Chain-of-Custody &amp; Handout Ledger</text>
+  </g>
+
+  <!-- Status Badge -->
+  <g transform="translate(365, 45)">
+    <rect x="0" y="0" width="105" height="26" rx="13" fill="rgba(16, 185, 129, 0.15)" stroke="#10B981" stroke-width="1" />
+    <text x="52" y="17" font-size="10.5" font-weight="800" fill="#34D399" text-anchor="middle">✓ VERIFIED</text>
+  </g>
+
+  <!-- Info Grid Box -->
+  <rect x="35" y="95" width="430" height="150" rx="10" fill="#070C18" stroke="#1E293B" stroke-width="1" />
+
+  <g fill="#E2E8F0" font-size="11" transform="translate(50, 115)">
+    <!-- Row 1 -->
+    <text x="0" y="5" fill="#94A3B8" font-size="9" text-transform="uppercase" font-family="'Courier New', monospace">DISPATCH EVENT ID</text>
+    <text x="0" y="22" font-weight="700" font-family="'Courier New', monospace" fill="#38BDF8">DSP-2026-09-NY492</text>
+
+    <text x="210" y="5" fill="#94A3B8" font-size="9" text-transform="uppercase" font-family="'Courier New', monospace">DELIVERY TIMESTAMP</text>
+    <text x="210" y="22" font-weight="700" font-family="'Courier New', monospace">2026-09-04 15:45:00 UTC</text>
+
+    <!-- Row 2 -->
+    <text x="0" y="48" fill="#94A3B8" font-size="9" text-transform="uppercase" font-family="'Courier New', monospace">FIELD COORDINATES</text>
+    <text x="0" y="65" font-weight="700" font-family="'Courier New', monospace" fill="#F59E0B">40.6782° N, 73.9442° W (Brooklyn, NY)</text>
+
+    <text x="210" y="48" fill="#94A3B8" font-size="9" text-transform="uppercase" font-family="'Courier New', monospace">VOLUNTEER LEAD</text>
+    <text x="210" y="65" font-weight="700">Marcus Vance &amp; Elena Rostova</text>
+
+    <!-- Row 3 -->
+    <text x="0" y="91" fill="#94A3B8" font-size="9" text-transform="uppercase" font-family="'Courier New', monospace">SUPPLIES DISTRIBUTED</text>
+    <text x="0" y="108" font-weight="700" fill="#34D399">40 Produce Crates • 20 Warmers • 35 Blankets</text>
+
+    <text x="210" y="91" fill="#94A3B8" font-size="9" text-transform="uppercase" font-family="'Courier New', monospace">ESCROW CONTRACT</text>
+    <text x="210" y="108" font-weight="700" font-family="'Courier New', monospace" fill="#A855F7">Solana Devnet: 5teRmiF5RDQA...ki4p</text>
+  </g>
+
+  <!-- Hand-Signed Stamp Area -->
+  <g transform="translate(35, 260)">
+    <!-- Volunteer Ledger Signature simulation -->
+    <rect x="0" y="0" width="260" height="70" rx="8" fill="#0A1122" stroke="#1E293B" />
+    <text x="14" y="20" font-size="9" fill="#94A3B8" font-family="'Courier New', monospace">VOLUNTEER SIGN-OFF &amp; RECIPIENT ROSTER:</text>
+    <path d="M 20 48 Q 50 30 80 50 T 130 42 T 180 55 T 230 40" fill="none" stroke="#60A5FA" stroke-width="2" stroke-linecap="round" />
+    <text x="14" y="62" font-size="8" fill="#64748B">Signed in presence of 45 community recipients</text>
+  </g>
+
+  <!-- Official Red Verification Seal Stamp -->
+  <g transform="translate(325, 258)">
+    <circle cx="55" cy="40" r="36" fill="none" stroke="#EF4444" stroke-width="2.5" stroke-dasharray="6 3" />
+    <circle cx="55" cy="40" r="30" fill="rgba(239, 68, 68, 0.08)" stroke="#EF4444" stroke-width="1" />
+    <text x="55" y="32" font-size="7.5" font-weight="900" fill="#EF4444" text-anchor="middle" letter-spacing="1">ECHOKIND</text>
+    <text x="55" y="43" font-size="9" font-weight="900" fill="#EF4444" text-anchor="middle" letter-spacing="1">AUDITED</text>
+    <text x="55" y="53" font-size="6.5" font-weight="800" fill="#EF4444" text-anchor="middle">PROOF CONFIRMED</text>
+  </g>
+
+  <!-- Bottom Verification Hash Bar -->
+  <g transform="translate(35, 345)" font-family="'Courier New', monospace" font-size="9">
+    <text x="0" y="10" fill="#64748B">SHA-256 HASH: 30c2166551a28cdf2bdb61b8f3c7110977096f3d6f5995fe86e50133e6140510</text>
+    <text x="430" y="10" text-anchor="end" fill="#10B981" font-weight="700">100% OFFLINE VERIFIABLE</text>
+  </g>
+</svg>

@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 640" width="100%" height="100%" style="font-family: 'Courier New', Courier, monospace; background: #FAF9F6;">
+  <defs>
+    <filter id="paperShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <rect x="10" y="10" width="380" height="620" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" filter="url(#paperShadow)" />
+
+  <!-- CVS Health Red Accent Header -->
+  <rect x="10" y="10" width="380" height="8" fill="#CC0000" rx="4" />
+
+  <g text-anchor="middle" fill="#0F172A">
+    <text x="200" y="48" font-size="19" font-weight="900" fill="#CC0000" letter-spacing="1">CVS HEALTH PHARMACY</text>
+    <text x="200" y="68" font-size="12" font-weight="700">STORE #8412 • COMMUNITY HEALTH CLINIC</text>
+    <text x="200" y="84" font-size="10" fill="#475569">450 GRAND CENTRAL AVE, DETROIT, MI 48202</text>
+    <text x="200" y="99" font-size="10" fill="#475569">TEL: (313) 555-0144 • 24-HR DISPENSARY</text>
+    <text x="200" y="113" font-size="9" fill="#16A34A">TAX EXEMPT HUMANITARIAN ID: 38-2940192</text>
+  </g>
+
+  <line x1="25" y1="124" x2="375" y2="124" stroke="#0F172A" stroke-width="1.5" stroke-dasharray="4 2" />
+
+  <!-- Metadata -->
+  <g font-size="10.5" fill="#334155">
+    <text x="25" y="142">DATE: 2026-09-04 11:15:30</text>
+    <text x="250" y="142">REG: 02  RX: #7741</text>
+    <text x="25" y="158">ORDER REF: CVS-DET-8412-MED</text>
+    <text x="250" y="158">BATCH: VERIFIED</text>
+    <text x="25" y="174">INSTITUTION: APPALACHIAN &amp; DETROIT RELIEF</text>
+  </g>
+
+  <line x1="25" y1="184" x2="375" y2="184" stroke="#0F172A" stroke-width="1" />
+
+  <!-- Table Header -->
+  <g font-size="11" font-weight="700" fill="#0F172A">
+    <text x="25" y="200">QTY</text>
+    <text x="65" y="200">PHARMACEUTICAL ITEM</text>
+    <text x="280" y="200">PRICE</text>
+    <text x="375" y="200" text-anchor="end">TOTAL</text>
+  </g>
+
+  <line x1="25" y1="208" x2="375" y2="208" stroke="#CBD5E1" stroke-width="1" />
+
+  <!-- Items -->
+  <g font-size="10.5" fill="#1E293B">
+    <text x="25" y="230" font-weight="700">20</text>
+    <text x="65" y="230">Pediatric Electrolytes &amp; Meds</text>
+    <text x="280" y="230">$18.00</text>
+    <text x="375" y="230" text-anchor="end" font-weight="700">$360.00 T</text>
+    <text x="65" y="244" font-size="9" fill="#64748B">NDC: 0071-0155-23 [Oral Rehydration Solutions]</text>
+
+    <text x="25" y="270" font-weight="700">12</text>
+    <text x="65" y="270">Thermal First-Aid Wraps &amp; Gauze</text>
+    <text x="280" y="270">$20.00</text>
+    <text x="375" y="270" text-anchor="end" font-weight="700">$240.00 T</text>
+    <text x="65" y="284" font-size="9" fill="#64748B">NDC: 50458-577-60 [Cold-Chain Trauma Kits]</text>
+  </g>
+
+  <line x1="25" y1="304" x2="375" y2="304" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="2 2" />
+
+  <!-- Total Calculation -->
+  <g font-size="12" fill="#0F172A">
+    <text x="25" y="326">SUBTOTAL (2 MEDICAL LINES):</text>
+    <text x="375" y="326" text-anchor="end" font-weight="700">$600.00</text>
+
+    <text x="25" y="346" fill="#16A34A">IRS 501(c)(3) EXEMPTION STATUS:</text>
+    <text x="375" y="346" text-anchor="end" fill="#16A34A" font-weight="700">TAX $0.00</text>
+
+    <line x1="25" y1="358" x2="375" y2="358" stroke="#0F172A" stroke-width="1.5" />
+
+    <text x="25" y="382" font-size="15" font-weight="900">BALANCE COMPLETED / TOTAL:</text>
+    <text x="375" y="382" text-anchor="end" font-size="16" font-weight="900" fill="#047857">$600.00 USD</text>
+  </g>
+
+  <line x1="25" y1="398" x2="375" y2="398" stroke="#0F172A" stroke-width="1" />
+
+  <!-- Payment Authorization -->
+  <g font-size="10" fill="#475569">
+    <text x="25" y="416">PAYMENT: SOLANA DEVNET MICRO-GRANT ESCROW</text>
+    <text x="25" y="430">ACCOUNT: ************8412  APPROVAL: 039218</text>
+    <text x="25" y="444">HASH: 88e3ea3237e8c3dccvspharmacyverified</text>
+  </g>
+
+  <!-- Gemini OCR Box -->
+  <rect x="25" y="460" width="350" height="60" rx="6" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5" stroke-dasharray="4 2" />
+  <g fill="#1D4ED8" text-anchor="middle">
+    <text x="200" y="482" font-size="12" font-weight="900" letter-spacing="1">✓ GEMINI VISIONGUARD PRO OCR VERIFIED</text>
+    <text x="200" y="499" font-size="10" font-weight="700">98% INVENTORY MATCH • MEDICAL COLD-CHAIN CONFIRMED</text>
+    <text x="200" y="512" font-size="9" fill="#2563EB">Smart Escrow Release Approved on Solana Devnet</text>
+  </g>
+
+  <!-- Barcode -->
+  <g fill="#0F172A" transform="translate(45, 536)">
+    <rect x="0" y="0" width="2" height="40" />
+    <rect x="4" y="0" width="4" height="40" />
+    <rect x="11" y="0" width="2" height="40" />
+    <rect x="15" y="0" width="5" height="40" />
+    <rect x="23" y="0" width="2" height="40" />
+    <rect x="28" y="0" width="3" height="40" />
+    <rect x="34" y="0" width="6" height="40" />
+    <rect x="43" y="0" width="2" height="40" />
+    <rect x="48" y="0" width="4" height="40" />
+    <rect x="55" y="0" width="1" height="40" />
+    <rect x="59" y="0" width="5" height="40" />
+    <rect x="67" y="0" width="3" height="40" />
+    <rect x="73" y="0" width="2" height="40" />
+    <rect x="78" y="0" width="6" height="40" />
+    <rect x="87" y="0" width="2" height="40" />
+    <rect x="92" y="0" width="4" height="40" />
+    <rect x="99" y="0" width="3" height="40" />
+    <rect x="105" y="0" width="5" height="40" />
+    <rect x="113" y="0" width="2" height="40" />
+    <rect x="118" y="0" width="4" height="40" />
+    <rect x="125" y="0" width="1" height="40" />
+    <rect x="129" y="0" width="6" height="40" />
+    <rect x="138" y="0" width="3" height="40" />
+    <rect x="144" y="0" width="4" height="40" />
+    <rect x="151" y="0" width="2" height="40" />
+    <rect x="156" y="0" width="5" height="40" />
+    <rect x="164" y="0" width="3" height="40" />
+    <rect x="170" y="0" width="2" height="40" />
+    <rect x="175" y="0" width="4" height="40" />
+    <rect x="182" y="0" width="2" height="40" />
+    <rect x="187" y="0" width="5" height="40" />
+    <rect x="195" y="0" width="3" height="40" />
+    <rect x="201" y="0" width="2" height="40" />
+    <rect x="206" y="0" width="4" height="40" />
+    <rect x="213" y="0" width="1" height="40" />
+    <rect x="217" y="0" width="6" height="40" />
+    <rect x="226" y="0" width="3" height="40" />
+    <rect x="232" y="0" width="4" height="40" />
+    <rect x="239" y="0" width="2" height="40" />
+    <rect x="244" y="0" width="5" height="40" />
+    <rect x="252" y="0" width="3" height="40" />
+    <rect x="258" y="0" width="2" height="40" />
+    <rect x="263" y="0" width="4" height="40" />
+    <rect x="270" y="0" width="1" height="40" />
+    <rect x="274" y="0" width="6" height="40" />
+    <rect x="283" y="0" width="3" height="40" />
+    <rect x="289" y="0" width="4" height="40" />
+    <rect x="296" y="0" width="2" height="40" />
+    <rect x="301" y="0" width="5" height="40" />
+  </g>
+  <text x="200" y="590" font-size="9" text-anchor="middle" fill="#64748B">CVS-8412-RX-7741-VERIFIED</text>
+  <text x="200" y="612" font-size="10" font-weight="700" text-anchor="middle" fill="#0F172A">CVS PHARMACY • CARING FOR COMMUNITY HEALTH</text>
+</svg>

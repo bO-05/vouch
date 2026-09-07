@@ -7,10 +7,12 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies & Build Artifacts
 node_modules
 dist
 dist-ssr
 *.local
+coverage/
 
 # Editor directories and files
 .vscode/*
@@ -23,9 +25,18 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment variables
+# Environment & Secrets (Never commit credentials)
 .env
+.env.local
+.env.*.local
 .env.production
+*.key
+*.pem
+*.cert
+*.secret
 
-# Server cache
-server/audio_cache
+# Server runtime cache & artifacts
+server/audio_cache/
+.system_generated/
+*.bak
+

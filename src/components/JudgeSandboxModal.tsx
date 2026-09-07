@@ -1,19 +1,30 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Key, Info, Coins } from './Icons';
+import { X, Sparkles, Key, Info, Coins, SnowflakeIcon, FileText, Volume2, Activity } from './Icons';
 import { GeminiService } from '../services/geminiService';
 import { ElevenLabsService } from '../services/elevenlabsService';
 import { SolanaService } from '../services/solanaService';
+import { ACTIVE_BRAND } from '../config/branding';
 
 interface JudgeSandboxModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAirdrop: () => void;
+  onTriggerSnowflake?: () => void;
+  onTriggerVisionOCR?: () => void;
+  onTriggerMultilingualVoice?: () => void;
+  onTriggerClimateRadar?: () => void;
+  onTriggerMicroGrant?: () => void;
 }
 
 export const JudgeSandboxModal: React.FC<JudgeSandboxModalProps> = ({
   isOpen,
   onClose,
-  onAirdrop
+  onAirdrop,
+  onTriggerSnowflake,
+  onTriggerVisionOCR,
+  onTriggerMultilingualVoice,
+  onTriggerClimateRadar,
+  onTriggerMicroGrant
 }) => {
   const [geminiKey, setGeminiKey] = useState(GeminiService.getApiKey());
   const [elevenLabsKey, setElevenLabsKey] = useState(ElevenLabsService.getApiKey());
@@ -35,35 +46,185 @@ export const JudgeSandboxModal: React.FC<JudgeSandboxModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 700, padding: 30 }}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 760, padding: 30 }}>
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{
-              width: 40,
-              height: 40,
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #A855F7, #EC4899)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <Sparkles size={22} color="#FFFFFF" />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, borderBottom: '1px solid var(--border-subtle)', paddingBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div className="modal-header-icon" style={{ borderColor: 'rgba(192, 132, 252, 0.3)', color: '#C084FC' }}>
+              <Sparkles size={20} color="#C084FC" />
             </div>
             <div>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 800 }}>DEV Judge Sandbox & Architecture</h2>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Targeting Google AI, ElevenLabs, Solana & Overall Winner Tracks
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em' }}>Judge Quick Showcase & Architecture</h2>
+                <span className="badge badge-tech" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
+                  &lt; 60s Tour
+                </span>
+              </div>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                DEV Weekend Challenge • Sponsor Category Interactive Tour & Live Telemetry
               </p>
             </div>
           </div>
 
-          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-            <X size={20} />
+          <button onClick={onClose} className="btn-close" aria-label="Close modal">
+            <X size={16} />
           </button>
         </div>
 
-        {/* Informative Note for Judges */}
+        {/* 1-Click Sponsor Verification Scenarios (Evaluate in Under 60 Seconds) */}
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.02)',
+          border: '1px solid var(--border-medium)',
+          borderRadius: 'var(--radius-lg)',
+          padding: 16,
+          marginBottom: 20
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Sparkles size={15} color="#C084FC" />
+              <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#F8FAFC' }}>
+                1-Click Sponsor Category Demos (Zero-Friction Evaluation)
+              </span>
+            </div>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+              Interactive Sandbox
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 10 }}>
+            {/* Button 1 (Snowflake) */}
+            <button
+              type="button"
+              onClick={() => { onClose(); onTriggerSnowflake?.(); }}
+              style={{
+                background: 'rgba(41, 181, 232, 0.08)',
+                border: '1px solid rgba(41, 181, 232, 0.35)',
+                borderRadius: 8,
+                padding: 12,
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#29B5E8', fontWeight: 700, fontSize: '0.86rem' }}>
+                <SnowflakeIcon size={16} color="#29B5E8" />
+                <span>1. Snowflake Cortex Anomaly Query</span>
+              </div>
+              <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                Opens warehouse modal, highlights cluster <code style={{ color: '#29B5E8' }}>VOUCH_ANALYTICS_WH</code>, and auto-executes Cortex SQL anomaly query.
+              </p>
+            </button>
+
+            {/* Button 2 (Gemini VisionGuard) */}
+            <button
+              type="button"
+              onClick={() => { onClose(); onTriggerVisionOCR?.(); }}
+              style={{
+                background: 'rgba(96, 165, 250, 0.08)',
+                border: '1px solid rgba(96, 165, 250, 0.35)',
+                borderRadius: 8,
+                padding: 12,
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#93C5FD', fontWeight: 700, fontSize: '0.86rem' }}>
+                <FileText size={16} color="#60A5FA" />
+                <span>2. Gemini Supermarket Receipt OCR</span>
+              </div>
+              <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                Opens VisionGuard modal, loads local grocery receipt SVG, extracts line items, and unlocks smart escrow at 98% match.
+              </p>
+            </button>
+
+            {/* Button 3 (ElevenLabs) */}
+            <button
+              type="button"
+              onClick={() => { onClose(); onTriggerMultilingualVoice?.(); }}
+              style={{
+                background: 'rgba(251, 113, 133, 0.08)',
+                border: '1px solid rgba(251, 113, 133, 0.35)',
+                borderRadius: 8,
+                padding: 12,
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#FDA4AF', fontWeight: 700, fontSize: '0.86rem' }}>
+                <Volume2 size={16} color="#FB7185" />
+                <span>3. Multilingual Voice &amp; Dialect Story</span>
+              </div>
+              <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                Jumps to East LA Spanish solidarity kitchen plea or Ukrainian request with authentic spoken native dialect audio.
+              </p>
+            </button>
+
+            {/* Button 4 (Open-Meteo) */}
+            <button
+              type="button"
+              onClick={() => { onClose(); onTriggerClimateRadar?.(); }}
+              style={{
+                background: 'rgba(56, 189, 248, 0.08)',
+                border: '1px solid rgba(56, 189, 248, 0.35)',
+                borderRadius: 8,
+                padding: 12,
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#38BDF8', fontWeight: 700, fontSize: '0.86rem' }}>
+                <Activity size={16} color="#38BDF8" />
+                <span>4. Trigger Climate Emergency Radar</span>
+              </div>
+              <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                Switches to Global Radar Map, targets Kharkiv (-14.2°C freeze) or Kentucky flood watch, and activates alert halo.
+              </p>
+            </button>
+
+            {/* Button 5 (Solana Sponsor Relayer) */}
+            <button
+              type="button"
+              onClick={() => { onClose(); onTriggerMicroGrant?.(); }}
+              style={{
+                background: 'rgba(20, 241, 149, 0.08)',
+                border: '1px solid rgba(20, 241, 149, 0.35)',
+                borderRadius: 8,
+                padding: 12,
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#14F195', fontWeight: 700, fontSize: '0.86rem' }}>
+                <Coins size={16} color="#14F195" />
+                <span>5. Gasless Devnet Sponsor Relayer</span>
+              </div>
+              <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                1-Click micro-grant broadcast to Ukraine Winter Emergency. No Phantom or faucet needed; generates confirmed on-chain Devnet slot &amp; signature.
+              </p>
+            </button>
+          </div>
+        </div>
+
+        {/* Informative Note for Protocol Telemetry */}
         <div style={{
           background: 'rgba(245, 158, 11, 0.08)',
           border: '1px solid rgba(245, 158, 11, 0.3)',
@@ -75,9 +236,9 @@ export const JudgeSandboxModal: React.FC<JudgeSandboxModalProps> = ({
         }}>
           <Info size={20} color="#F59E0B" style={{ flexShrink: 0, marginTop: 2 }} />
           <div style={{ fontSize: '0.84rem', color: '#FDE68A', lineHeight: 1.5 }}>
-            <strong>Zero-Setup Sandbox Ready:</strong> You do not need to provide personal API keys or crypto funds to test EchoKind. 
-            All AI multimodal flows, voice synthesis, and Solana Devnet ledger actions are pre-configured to execute smoothly. 
-            You can optionally enter your personal keys below to test direct production API calls.
+            <strong>Zero-Configuration Mode Active:</strong> {ACTIVE_BRAND.name} is designed to run completely friction-free.
+            Multimodal AI structuring, voice narration, and Solana Devnet escrow queries are fully functional out-of-the-box.
+            You can optionally insert custom third-party API credentials below to verify live production endpoints.
           </div>
         </div>
 
@@ -178,7 +339,7 @@ export const JudgeSandboxModal: React.FC<JudgeSandboxModalProps> = ({
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               • <strong>Instant Micro-Donations</strong>: Negligible fees allow donors to give as little as 0.05 SOL ($7) without losing 30% to credit card processors.<br />
               • <strong>Milestone Escrow</strong>: Donated funds remain safely in escrow until Gemini Vision verifies photographic delivery proof.<br />
-              • <strong>Public Explorer Verification</strong>: Every grant produces a live Solana Devnet transaction signature viewable on Explorer.
+              • <strong>Public Explorer & Verifiable Ledger</strong>: Connect Phantom to broadcast live on-chain Devnet transactions viewable on Solana Explorer, or test in zero-config Judge Sponsor Relayer mode where real on-chain Devnet transactions are broadcast and verified without requiring Phantom or personal Devnet tokens (<code>POST /api/solana/broadcast-grant</code> &amp; <code>GET /api/solana/verify-tx/:sig</code>).
             </p>
           </div>
         </div>
