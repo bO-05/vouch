@@ -4,6 +4,7 @@ import { GeminiService } from '../services/geminiService';
 import { ElevenLabsService } from '../services/elevenlabsService';
 import { SolanaService, PROTOCOL_ESCROW_VAULT } from '../services/solanaService';
 import { AidRequest } from '../types';
+import { geocodeLocation } from '../data/worldMapPaths';
 
 interface VoiceRecorderModalProps {
   isOpen: boolean;
@@ -264,16 +265,7 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({
     if (!analyzedData) return;
 
     const locClean = location.trim() || 'Local Community';
-    const locLower = locClean.toLowerCase();
-    let coords = { lat: 37.7749, lng: -122.4194 };
-    if (locLower.includes('brooklyn') || locLower.includes('new york')) coords = { lat: 40.7128, lng: -74.0060 };
-    else if (locLower.includes('los angeles') || locLower.includes('east la')) coords = { lat: 34.0224, lng: -118.1670 };
-    else if (locLower.includes('detroit')) coords = { lat: 42.3314, lng: -83.0458 };
-    else if (locLower.includes('hazard') || locLower.includes('kentucky')) coords = { lat: 37.2498, lng: -83.1932 };
-    else if (locLower.includes('oakland') || locLower.includes('bay area')) coords = { lat: 37.8044, lng: -122.2712 };
-    else if (locLower.includes('kharkiv') || locLower.includes('ukraine')) coords = { lat: 49.9935, lng: 36.2304 };
-    else if (locLower.includes('nairobi') || locLower.includes('kenya')) coords = { lat: -1.2921, lng: 36.8219 };
-    else if (locLower.includes('montreal') || locLower.includes('canada')) coords = { lat: 45.5017, lng: -73.5673 };
+    const coords = geocodeLocation(locClean);
 
     const userWallet = SolanaService.getWallet();
     const recipient = userWallet.publicKey || PROTOCOL_ESCROW_VAULT;

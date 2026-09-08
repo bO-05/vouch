@@ -110,6 +110,7 @@ export const FulfillmentProofModal: React.FC<FulfillmentProofModalProps> = ({
         }
       }).catch(err => {
         console.error('Auto verify failed:', err);
+        setUploadError(err?.message || 'Automatic verification failed.');
       }).finally(() => {
         setIsVerifying(false);
       });
@@ -119,12 +120,14 @@ export const FulfillmentProofModal: React.FC<FulfillmentProofModalProps> = ({
   if (!isOpen || !request) return null;
 
   const handleSelectSampleReceipt = (receipt: typeof SAMPLE_RECEIPTS[0]) => {
+    setUploadError(null);
     setProofType('receipt');
     setProofImage(receipt.url);
     setProofNotes(receipt.notes);
   };
 
   const handleSelectSamplePhoto = (photo: typeof SAMPLE_DELIVERY_PHOTOS[0]) => {
+    setUploadError(null);
     setProofType('photo');
     setProofImage(photo.url);
     setProofNotes(photo.notes || 'Field delivery log: Handed out supplies directly to community members with signed volunteer ledger.');
@@ -132,6 +135,7 @@ export const FulfillmentProofModal: React.FC<FulfillmentProofModalProps> = ({
 
   const handleVerifyWithGemini = async () => {
     setIsVerifying(true);
+    setUploadError(null);
     try {
       const result = await GeminiService.verifyFulfillmentProof(
         request.itemsNeeded,
@@ -146,8 +150,9 @@ export const FulfillmentProofModal: React.FC<FulfillmentProofModalProps> = ({
         SolanaService.unlockEscrowForRequest(request.id);
         onProofVerified(request.id, proofImage, proofNotes, result.confidenceScore, result.receiptDetails);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setUploadError(err?.message || 'Verification failed. Please retry.');
     } finally {
       setIsVerifying(false);
     }

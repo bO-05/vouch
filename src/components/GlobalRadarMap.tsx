@@ -11,12 +11,13 @@ import {
   projectCoords, 
   geocodeLocation 
 } from '../data/worldMapPaths';
+import { ElevenLabsService } from '../services/elevenlabsService';
 
 interface GlobalRadarMapProps {
   requests: AidRequest[];
   selectedRequestId: string | null;
   onSelectRequest: (req: AidRequest) => void;
-  onPlayAudio: (req: AidRequest) => void;
+  onPlayAudio: (req: AidRequest, langMode?: 'original' | 'english') => void;
   isPlayingAudio: boolean;
   activePlayingId: string | null;
   onOpenDonateModal: (req: AidRequest, presetSOL?: number) => void;
@@ -46,6 +47,7 @@ export const GlobalRadarMap: React.FC<GlobalRadarMapProps> = ({
 
   const initialId = cleanId(selectedRequestId) || (requests[0]?.id ?? null);
   const [activePinId, setActivePinId] = useState<string | null>(initialId);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
   const [projectionMode, setProjectionMode] = useState<'naturalEarth' | 'equirectangular'>('naturalEarth');
   const [zoom, setZoom] = useState<number>(1.0);
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -72,8 +74,24 @@ export const GlobalRadarMap: React.FC<GlobalRadarMapProps> = ({
     }
   }, [selectedRequestId]);
 
+  const displayedRequests = requests.filter(req => {
+    if (selectedLanguage === 'all') return true;
+    if (selectedLanguage === 'en') {
+      return !req.originalLanguage || req.originalLanguage.startsWith('en');
+    }
+    return req.originalLanguage && req.originalLanguage.toLowerCase().startsWith(selectedLanguage.toLowerCase());
+  });
+
+  const getLanguageTag = (req: AidRequest): string | null => {
+    if (req.originalLanguage) {
+      const code = req.originalLanguage.split('-')[0].toUpperCase();
+      if (code !== 'EN') return code;
+    }
+    return null;
+  };
+
   // Active request - fallback to first request if not found
-  const activeReq = (activePinId ? requests.find(r => r.id === activePinId) : null) || requests[0];
+  const activeReq = (activePinId ? displayedRequests.find(r => r.id === activePinId) : null) || displayedRequests[0] || requests[0];
 
   // Helper to project coordinates with automatic fallback geocoding
   const getCoordinatesForRequest = (req: AidRequest) => {
@@ -250,6 +268,50 @@ export const GlobalRadarMap: React.FC<GlobalRadarMapProps> = ({
                 <span>Equirectangular</span>
               </span>
             </button>
+          </div>
+
+          {/* Multilingual Radar Language Filter */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: 'rgba(255, 255, 255, 0.05)',
+            padding: 3,
+            borderRadius: 'var(--radius-full)',
+            border: '1px solid var(--border-subtle)',
+            flexWrap: 'wrap',
+            gap: 2
+          }}>
+            {[
+              { id: 'all', label: 'All Dialects' },
+              { id: 'es', label: 'Español' },
+              { id: 'uk', label: 'Українська' },
+              { id: 'fr', label: 'Français' },
+              { id: 'ar', label: 'العربية' },
+              { id: 'hi', label: 'हिन्दी' },
+              { id: 'en', label: 'English' }
+            ].map(lang => (
+              <button
+                key={lang.id}
+                onClick={() => {
+                  setSelectedLanguage(lang.id);
+                  ElevenLabsService.stopAudio();
+                }}
+                style={{
+                  background: selectedLanguage === lang.id ? 'rgba(168, 85, 247, 0.25)' : 'transparent',
+                  border: selectedLanguage === lang.id ? '1px solid rgba(168, 85, 247, 0.45)' : 'none',
+                  color: selectedLanguage === lang.id ? '#C084FC' : 'var(--text-muted)',
+                  borderRadius: 'var(--radius-full)',
+                  padding: '3px 9px',
+                  fontSize: '0.70rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+                title={`Filter radar to ${lang.label} beacons`}
+              >
+                {lang.label}
+              </button>
+            ))}
           </div>
 
           {/* Theme Legend */}
@@ -437,24 +499,31 @@ export const GlobalRadarMap: React.FC<GlobalRadarMapProps> = ({
           )}
 
           {/* Real Geographic Beacon Pins for Community Requests */}
-          {requests.map((req) => {
+          {displayedRequests.map((req) => {
             const coords = getCoordinatesForRequest(req);
             const { x, y } = projectCoords(coords.lat, coords.lng, projectionMode);
             const isSelected = req.id === activePinId;
             const isHovered = req.id === hoveredReqId;
             const themeColor = getThemeColor(req.unTheme);
             const isFreeze = req.climateData?.alertLevel === 'cold_freeze' || (req.climateData?.temperatureC ?? 10) <= 0;
+            const langTag = getLanguageTag(req);
 
             return (
               <g
                 key={req.id}
                 style={{ cursor: 'pointer' }}
                 onClick={() => {
+                  if (activePinId !== req.id) {
+                    ElevenLabsService.stopAudio();
+                  }
                   setActivePinId(req.id);
                   onSelectRequest(req);
                 }}
                 onTouchEnd={(e) => {
                   e.stopPropagation();
+                  if (activePinId !== req.id) {
+                    ElevenLabsService.stopAudio();
+                  }
                   setActivePinId(req.id);
                   onSelectRequest(req);
                 }}
@@ -494,7 +563,7 @@ export const GlobalRadarMap: React.FC<GlobalRadarMapProps> = ({
                 {/* Inner Jewel Pulse */}
                 <circle cx={x} cy={y} r={isSelected ? 3 : 2} fill="#FFFFFF" />
 
-                {/* City Label */}
+                {/* City Label & Language Tag */}
                 <text
                   x={x}
                   y={y - 12}
@@ -508,7 +577,7 @@ export const GlobalRadarMap: React.FC<GlobalRadarMapProps> = ({
                     letterSpacing: '0.02em'
                   }}
                 >
-                  {req.location.split(',')[0]}
+                  {req.location.split(',')[0]} {langTag ? `[${langTag}]` : ''}
                 </text>
 
                 {/* Live Temperature Tag */}
@@ -718,6 +787,22 @@ export const GlobalRadarMap: React.FC<GlobalRadarMapProps> = ({
                 <MapPin size={12} color="var(--primary-amber)" />
                 {activeReq.location}
               </span>
+              {activeReq.originalLanguageLabel && (
+                <span style={{
+                  background: 'rgba(168, 85, 247, 0.14)',
+                  border: '1px solid rgba(168, 85, 247, 0.35)',
+                  color: '#C084FC',
+                  fontSize: '0.68rem',
+                  padding: '2px 8px',
+                  borderRadius: 'var(--radius-full)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}>
+                  <Globe size={11} />
+                  <span>Spoken in: {activeReq.originalLanguageLabel}</span>
+                </span>
+              )}
               {activeReq.is501c3Verified && (
                 <button
                   onClick={() => onOpenNonprofitModal(activeReq)}
@@ -747,6 +832,21 @@ export const GlobalRadarMap: React.FC<GlobalRadarMapProps> = ({
             <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {activeReq.description}
             </p>
+            {activeReq.originalTranscript && (
+              <div style={{
+                marginTop: 6,
+                padding: '4px 8px',
+                background: 'rgba(168, 85, 247, 0.08)',
+                borderLeft: '2px solid #A855F7',
+                borderRadius: '0 4px 4px 0',
+                fontSize: '0.76rem',
+                color: '#CBD5E1',
+                fontStyle: 'italic',
+                lineHeight: 1.3
+              }}>
+                "{activeReq.originalTranscript}"
+              </div>
+            )}
           </div>
 
           {/* Middle Column: Live Climate Pill & Audio Player */}
@@ -776,34 +876,98 @@ export const GlobalRadarMap: React.FC<GlobalRadarMapProps> = ({
             )}
 
             {/* In-Radar Spoken Audio Button (Touch Friendly) */}
-            <button
-              onClick={() => onPlayAudio(activeReq)}
-              className="btn btn-secondary"
-              style={{
-                width: '100%',
-                minHeight: 44,
-                justifyContent: 'center',
-                fontSize: '0.82rem',
-                padding: '10px 14px',
-                background: activePlayingId === activeReq.id && isPlayingAudio ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                borderColor: activePlayingId === activeReq.id && isPlayingAudio ? 'var(--primary-amber)' : 'var(--border-subtle)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8
-              }}
-            >
-              {activePlayingId === activeReq.id && isPlayingAudio ? (
-                <>
-                  <Pause size={16} color="var(--primary-amber)" />
-                  <span>Pause Spoken Story</span>
-                </>
-              ) : (
-                <>
-                  <Play size={16} color="var(--primary-amber)" />
-                  <span>Listen to Spoken Story ({activeReq.audioDurationSec}s)</span>
-                </>
-              )}
-            </button>
+            {activeReq.originalTranscript || (activeReq.originalLanguage && !activeReq.originalLanguage.startsWith('en')) ? (
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button
+                  onClick={() => onPlayAudio(activeReq, 'original')}
+                  className="btn btn-secondary"
+                  style={{
+                    flex: 1,
+                    minHeight: 44,
+                    justifyContent: 'center',
+                    fontSize: '0.76rem',
+                    padding: '8px 10px',
+                    background: activePlayingId === `${activeReq.id}-original` && isPlayingAudio ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                    borderColor: activePlayingId === `${activeReq.id}-original` && isPlayingAudio ? '#A855F7' : 'var(--border-subtle)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    color: '#C084FC'
+                  }}
+                  title={`Listen in ${activeReq.originalLanguageLabel || 'Native Tongue'}`}
+                >
+                  {activePlayingId === `${activeReq.id}-original` && isPlayingAudio ? (
+                    <>
+                      <Pause size={14} color="#A855F7" />
+                      <span>Pause Native</span>
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 size={14} color="#A855F7" />
+                      <span>{activeReq.originalLanguageLabel || 'Native Tongue'}</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => onPlayAudio(activeReq, 'english')}
+                  className="btn btn-secondary"
+                  style={{
+                    flex: 1,
+                    minHeight: 44,
+                    justifyContent: 'center',
+                    fontSize: '0.76rem',
+                    padding: '8px 10px',
+                    background: (activePlayingId === `${activeReq.id}-english` || activePlayingId === activeReq.id) && isPlayingAudio ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                    borderColor: (activePlayingId === `${activeReq.id}-english` || activePlayingId === activeReq.id) && isPlayingAudio ? 'var(--primary-amber)' : 'var(--border-subtle)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6
+                  }}
+                  title="Listen in English Narration"
+                >
+                  {(activePlayingId === `${activeReq.id}-english` || activePlayingId === activeReq.id) && isPlayingAudio ? (
+                    <>
+                      <Pause size={14} color="var(--primary-amber)" />
+                      <span>Pause English</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play size={14} color="var(--primary-amber)" />
+                      <span>English Voice</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => onPlayAudio(activeReq, 'english')}
+                className="btn btn-secondary"
+                style={{
+                  width: '100%',
+                  minHeight: 44,
+                  justifyContent: 'center',
+                  fontSize: '0.82rem',
+                  padding: '10px 14px',
+                  background: activePlayingId === activeReq.id && isPlayingAudio ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                  borderColor: activePlayingId === activeReq.id && isPlayingAudio ? 'var(--primary-amber)' : 'var(--border-subtle)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8
+                }}
+              >
+                {activePlayingId === activeReq.id && isPlayingAudio ? (
+                  <>
+                    <Pause size={16} color="var(--primary-amber)" />
+                    <span>Pause Spoken Story</span>
+                  </>
+                ) : (
+                  <>
+                    <Play size={16} color="var(--primary-amber)" />
+                    <span>Listen to Spoken Story ({activeReq.audioDurationSec}s)</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
 
           {/* Right Column: Funding Progress & 1-Click Micro-Grant */}

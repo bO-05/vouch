@@ -59,7 +59,21 @@ export const CITY_COORDINATES: Record<string, { lat: number; lng: number }> = {
   'paris': { lat: 48.8566, lng: 2.3522 },
   'berlin': { lat: 52.5200, lng: 13.4050 },
   'tokyo': { lat: 35.6762, lng: 139.6503 },
-  'sydney': { lat: -33.8688, lng: 151.2093 }
+  'sydney': { lat: -33.8688, lng: 151.2093 },
+  'montreal': { lat: 45.5017, lng: -73.5673 },
+  'quebec': { lat: 46.8139, lng: -71.2080 },
+  'beirut': { lat: 33.8938, lng: 35.5018 },
+  'lebanon': { lat: 33.8547, lng: 35.8623 },
+  'delhi': { lat: 28.6139, lng: 77.2090 },
+  'new delhi': { lat: 28.6139, lng: 77.2090 },
+  'mumbai': { lat: 19.0760, lng: 72.8777 },
+  'india': { lat: 20.5937, lng: 78.9629 },
+  'bogota': { lat: 4.7110, lng: -74.0721 },
+  'colombia': { lat: 4.5709, lng: -74.2973 },
+  'madrid': { lat: 40.4168, lng: -3.7038 },
+  'barcelona': { lat: 41.3851, lng: 2.1734 },
+  'amman': { lat: 31.9539, lng: 35.9106 },
+  'jordan': { lat: 31.9539, lng: 35.9106 }
 };
 
 export function geocodeLocation(locationStr?: string): { lat: number; lng: number } {

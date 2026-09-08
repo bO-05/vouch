@@ -62,6 +62,8 @@ export class ElevenLabsService {
   private static activePitch: number = 1.0;
   private static estimatedDurationMs: number = 10000;
   private static tickerTimer: any = null;
+  private static activeSessionId: number = 0;
+  private static activeAbortController: AbortController | null = null;
 
   static {
     // Pre-cache available voices in modern browsers
@@ -133,6 +135,10 @@ export class ElevenLabsService {
     langCode?: string
   ): Promise<void> {
     this.stopAudio();
+    const sessionId = ++ElevenLabsService.activeSessionId;
+    const abortController = new AbortController();
+    ElevenLabsService.activeAbortController = abortController;
+
     this.currentProgress = 0;
     this.activeText = text;
     this.activeVoiceId = voiceId;
@@ -148,12 +154,20 @@ export class ElevenLabsService {
       const res = await fetch(apiUrl('/api/elevenlabs/synthesize'), {
         method: 'POST',
         headers,
-        body: JSON.stringify({ text, voiceId })
+        body: JSON.stringify({ text, voiceId }),
+        signal: abortController.signal
       });
+
+      if (sessionId !== ElevenLabsService.activeSessionId || abortController.signal.aborted) {
+        return;
+      }
 
       const contentType = res.headers.get('content-type') || '';
       if (res.ok && contentType.includes('audio')) {
         const blob = await res.blob();
+        if (sessionId !== ElevenLabsService.activeSessionId || abortController.signal.aborted) {
+          return;
+        }
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
         this.currentAudio = audio;
@@ -192,10 +206,18 @@ export class ElevenLabsService {
           onError?.(e);
         };
 
+        if (sessionId !== ElevenLabsService.activeSessionId || abortController.signal.aborted) {
+          URL.revokeObjectURL(url);
+          return;
+        }
+
         await audio.play();
         return;
       }
-    } catch (e) {
+    } catch (e: any) {
+      if (sessionId !== ElevenLabsService.activeSessionId || abortController.signal.aborted) {
+        return;
+      }
       console.info('Backend audio synthesize not reachable, attempting client options.');
     }
 
@@ -217,12 +239,20 @@ export class ElevenLabsService {
                 stability: 0.5,
                 similarity_boost: 0.75
               }
-            })
+            }),
+            signal: abortController.signal
           }
         );
 
+        if (sessionId !== ElevenLabsService.activeSessionId || abortController.signal.aborted) {
+          return;
+        }
+
         if (response.ok) {
           const blob = await response.blob();
+          if (sessionId !== ElevenLabsService.activeSessionId || abortController.signal.aborted) {
+            return;
+          }
           const url = URL.createObjectURL(blob);
           const audio = new Audio(url);
           this.currentAudio = audio;
@@ -261,12 +291,24 @@ export class ElevenLabsService {
             onError?.(e);
           };
 
+          if (sessionId !== ElevenLabsService.activeSessionId || abortController.signal.aborted) {
+            URL.revokeObjectURL(url);
+            return;
+          }
+
           await audio.play();
           return;
         }
-      } catch (err) {
+      } catch (err: any) {
+        if (sessionId !== ElevenLabsService.activeSessionId || abortController.signal.aborted) {
+          return;
+        }
         console.warn('Direct ElevenLabs API request failed, falling back to Web Speech synthesis:', err);
       }
+    }
+
+    if (sessionId !== ElevenLabsService.activeSessionId || abortController.signal.aborted) {
+      return;
     }
 
     // 3. Multilingual Web Speech Fallback for zero-friction judge evaluation
@@ -286,82 +328,106 @@ export class ElevenLabsService {
       let chosenPitch = 1.0;
       let personaLabel = '';
 
-      // Determine distinct audio profile and voice persona by voiceId
-      if (voiceId === 'pNInz6obpgDQGcFmaJgB') {
-        // 1. ADAM (Crisis & Disaster Lead): Calm, authoritative baritone male voice
-        matchedVoice = allVoices.find(v => 
-          v.lang.toLowerCase().startsWith('en') &&
-          (v.name.toLowerCase().includes('david') ||
-           v.name.toLowerCase().includes('mark') ||
-           v.name.toLowerCase().includes('guy') ||
-           v.name.toLowerCase().includes('george') ||
-           v.name.toLowerCase().includes('james') ||
-           v.name.toLowerCase().includes('male'))
-        ) || allVoices.find(v => v.lang.toLowerCase().startsWith('en')) || allVoices[0];
-        chosenRate = 0.88;
-        chosenPitch = 0.70;
-        personaLabel = matchedVoice ? `Web Speech · Adam (${matchedVoice.name})` : 'Web Speech · Adam (Crisis Baritone)';
-      } else if (voiceId === 'AZnzlk1XvdvUeBnXmlld') {
-        // 2. MARCELA (Español Solidario): Heartfelt Spanish / Latin American voice
-        matchedVoice = allVoices.find(v => 
-          v.lang.toLowerCase().startsWith('es') ||
-          v.name.toLowerCase().includes('spanish') ||
-          v.name.toLowerCase().includes('monica') ||
-          v.name.toLowerCase().includes('paulina') ||
-          v.name.toLowerCase().includes('laura') ||
-          v.name.toLowerCase().includes('helena') ||
-          v.name.toLowerCase().includes('jorge') ||
-          v.name.toLowerCase().includes('diego')
-        ) || allVoices.find(v => 
-          v.name.toLowerCase().includes('zira') ||
-          v.name.toLowerCase().includes('samantha') ||
-          v.name.toLowerCase().includes('female')
-        ) || allVoices[0];
-        chosenRate = 0.96;
-        chosenPitch = 1.02;
-        personaLabel = matchedVoice ? `Web Speech · Marcela (${matchedVoice.name})` : 'Web Speech · Marcela (Español Solidario)';
-      } else if (voiceId === 'ThT5KcBeYPX3keUQqHPh') {
-        // 3. OLENA (Ukrainian Voice): Resilient Eastern European / Ukrainian voice
-        matchedVoice = allVoices.find(v => 
-          v.lang.toLowerCase().includes('uk') || 
-          v.name.toLowerCase().includes('ukrain') ||
-          v.name.toLowerCase().includes('lesya') ||
-          v.name.toLowerCase().includes('polina')
-        ) || allVoices.find(v => 
-          v.name.toLowerCase().includes('zira') ||
-          v.name.toLowerCase().includes('samantha') ||
-          v.name.toLowerCase().includes('female')
-        ) || allVoices[0];
-        chosenRate = 0.90;
-        chosenPitch = 1.05;
-        personaLabel = matchedVoice ? `Web Speech · Olena (${matchedVoice.name})` : 'Web Speech · Olena (Український Голос)';
-      } else if (voiceId === 'ErXwobaYiN019PkySvjV') {
-        // 4. ANTONI (Youth & Tech Solidarity): Energetic, inspiring young male voice
-        matchedVoice = allVoices.find(v => 
-          v.lang.toLowerCase().startsWith('en') &&
-          (v.name.toLowerCase().includes('alex') ||
-           v.name.toLowerCase().includes('daniel') ||
-           v.name.toLowerCase().includes('fred') ||
-           v.name.toLowerCase().includes('tom') ||
-           v.name.toLowerCase().includes('david'))
-        ) || allVoices.find(v => v.lang.toLowerCase().startsWith('en')) || allVoices[0];
-        chosenRate = 1.10;
-        chosenPitch = 1.25;
-        personaLabel = matchedVoice ? `Web Speech · Antoni (${matchedVoice.name})` : 'Web Speech · Antoni (Youth & Tech)';
-      } else {
-        // 5. RACHEL (Empathetic Storyteller): Default warm, nurturing female voice
-        matchedVoice = allVoices.find(v => 
-          v.lang.toLowerCase().startsWith('en') && 
-          (v.name.toLowerCase().includes('samantha') ||
-           v.name.toLowerCase().includes('jenny') ||
-           v.name.toLowerCase().includes('zira') ||
-           v.name.toLowerCase().includes('victoria') ||
-           v.name.toLowerCase().includes('karen') ||
-           v.name.toLowerCase().includes('female'))
-        ) || allVoices.find(v => v.lang.toLowerCase().startsWith('en')) || allVoices[0];
-        chosenRate = 0.95;
-        chosenPitch = 1.12;
-        personaLabel = matchedVoice ? `Web Speech · Rachel (${matchedVoice.name})` : 'Web Speech · Rachel (Empathetic Storyteller)';
+      // Multilingual voice matching when requesting native dialect
+      if (!normLang.startsWith('en')) {
+        const langPrefix = normLang.slice(0, 2);
+        matchedVoice = allVoices.find(v => v.lang.toLowerCase().startsWith(langPrefix)) ||
+                       allVoices.find(v => v.name.toLowerCase().includes(
+                         langPrefix === 'fr' ? 'french' :
+                         langPrefix === 'ar' ? 'arabic' :
+                         langPrefix === 'hi' ? 'hindi' :
+                         langPrefix === 'es' ? 'spanish' : 'ukrain'
+                       ));
+        if (matchedVoice) {
+          if (langPrefix === 'fr') personaLabel = `Web Speech · Native French (${matchedVoice.name})`;
+          else if (langPrefix === 'ar') personaLabel = `Web Speech · Native Arabic (${matchedVoice.name})`;
+          else if (langPrefix === 'hi') personaLabel = `Web Speech · Native Hindi (${matchedVoice.name})`;
+          else if (langPrefix === 'es') personaLabel = `Web Speech · Marcela / Spanish (${matchedVoice.name})`;
+          else if (langPrefix === 'uk') personaLabel = `Web Speech · Olena / Ukrainian (${matchedVoice.name})`;
+          else personaLabel = `Web Speech · Native (${matchedVoice.name})`;
+          chosenRate = 0.95;
+          chosenPitch = 1.0;
+        }
+      }
+
+      // Determine distinct audio profile and voice persona by voiceId if not already set by native language
+      if (!matchedVoice) {
+        if (voiceId === 'pNInz6obpgDQGcFmaJgB') {
+          // 1. ADAM (Crisis & Disaster Lead): Calm, authoritative baritone male voice
+          matchedVoice = allVoices.find(v => 
+            v.lang.toLowerCase().startsWith('en') &&
+            (v.name.toLowerCase().includes('david') ||
+             v.name.toLowerCase().includes('mark') ||
+             v.name.toLowerCase().includes('guy') ||
+             v.name.toLowerCase().includes('george') ||
+             v.name.toLowerCase().includes('james') ||
+             v.name.toLowerCase().includes('male'))
+          ) || allVoices.find(v => v.lang.toLowerCase().startsWith('en')) || allVoices[0];
+          chosenRate = 0.88;
+          chosenPitch = 0.70;
+          personaLabel = matchedVoice ? `Web Speech · Adam (${matchedVoice.name})` : 'Web Speech · Adam (Crisis Baritone)';
+        } else if (voiceId === 'AZnzlk1XvdvUeBnXmlld') {
+          // 2. MARCELA (Español Solidario): Heartfelt Spanish / Latin American voice
+          matchedVoice = allVoices.find(v => 
+            v.lang.toLowerCase().startsWith('es') ||
+            v.name.toLowerCase().includes('spanish') ||
+            v.name.toLowerCase().includes('monica') ||
+            v.name.toLowerCase().includes('paulina') ||
+            v.name.toLowerCase().includes('laura') ||
+            v.name.toLowerCase().includes('helena') ||
+            v.name.toLowerCase().includes('jorge') ||
+            v.name.toLowerCase().includes('diego')
+          ) || allVoices.find(v => 
+            v.name.toLowerCase().includes('zira') ||
+            v.name.toLowerCase().includes('samantha') ||
+            v.name.toLowerCase().includes('female')
+          ) || allVoices[0];
+          chosenRate = 0.96;
+          chosenPitch = 1.02;
+          personaLabel = matchedVoice ? `Web Speech · Marcela (${matchedVoice.name})` : 'Web Speech · Marcela (Español Solidario)';
+        } else if (voiceId === 'ThT5KcBeYPX3keUQqHPh') {
+          // 3. OLENA (Ukrainian Voice): Resilient Eastern European / Ukrainian voice
+          matchedVoice = allVoices.find(v => 
+            v.lang.toLowerCase().includes('uk') || 
+            v.name.toLowerCase().includes('ukrain') ||
+            v.name.toLowerCase().includes('lesya') ||
+            v.name.toLowerCase().includes('polina')
+          ) || allVoices.find(v => 
+            v.name.toLowerCase().includes('zira') ||
+            v.name.toLowerCase().includes('samantha') ||
+            v.name.toLowerCase().includes('female')
+          ) || allVoices[0];
+          chosenRate = 0.90;
+          chosenPitch = 1.05;
+          personaLabel = matchedVoice ? `Web Speech · Olena (${matchedVoice.name})` : 'Web Speech · Olena (Український Голос)';
+        } else if (voiceId === 'ErXwobaYiN019PkySvjV') {
+          // 4. ANTONI (Youth & Tech Solidarity): Energetic, inspiring young male voice
+          matchedVoice = allVoices.find(v => 
+            v.lang.toLowerCase().startsWith('en') &&
+            (v.name.toLowerCase().includes('alex') ||
+             v.name.toLowerCase().includes('daniel') ||
+             v.name.toLowerCase().includes('fred') ||
+             v.name.toLowerCase().includes('tom') ||
+             v.name.toLowerCase().includes('david'))
+          ) || allVoices.find(v => v.lang.toLowerCase().startsWith('en')) || allVoices[0];
+          chosenRate = 1.10;
+          chosenPitch = 1.25;
+          personaLabel = matchedVoice ? `Web Speech · Antoni (${matchedVoice.name})` : 'Web Speech · Antoni (Youth & Tech)';
+        } else {
+          // 5. RACHEL (Empathetic Storyteller): Default warm, nurturing female voice
+          matchedVoice = allVoices.find(v => 
+            v.lang.toLowerCase().startsWith('en') && 
+            (v.name.toLowerCase().includes('samantha') ||
+             v.name.toLowerCase().includes('jenny') ||
+             v.name.toLowerCase().includes('zira') ||
+             v.name.toLowerCase().includes('victoria') ||
+             v.name.toLowerCase().includes('karen') ||
+             v.name.toLowerCase().includes('female'))
+          ) || allVoices.find(v => v.lang.toLowerCase().startsWith('en')) || allVoices[0];
+          chosenRate = 0.95;
+          chosenPitch = 1.12;
+          personaLabel = matchedVoice ? `Web Speech · Rachel (${matchedVoice.name})` : 'Web Speech · Rachel (Empathetic Storyteller)';
+        }
       }
 
       if (matchedVoice) {
@@ -450,6 +516,13 @@ export class ElevenLabsService {
   }
 
   public static stopAudio() {
+    ElevenLabsService.activeSessionId++;
+    if (ElevenLabsService.activeAbortController) {
+      try {
+        ElevenLabsService.activeAbortController.abort();
+      } catch (e) {}
+      ElevenLabsService.activeAbortController = null;
+    }
     if (this.tickerTimer) {
       clearInterval(this.tickerTimer);
       this.tickerTimer = null;

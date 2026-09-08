@@ -263,9 +263,12 @@ Extract and return a valid JSON object ONLY:
   ): Promise<VerificationResult> {
     // 1. Try Backend API endpoint
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (this.apiKey) headers['x-gemini-key'] = this.apiKey;
+
       const res = await fetch(apiUrl('/api/gemini/verify-proof'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           requestId,
           proofNotes: proofDescription,

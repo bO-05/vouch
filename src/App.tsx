@@ -390,6 +390,9 @@ export const App: React.FC = () => {
     if (l.includes('kharkiv') || l.includes('ukraine')) return { lat: 49.9935, lng: 36.2304 };
     if (l.includes('nairobi') || l.includes('kenya')) return { lat: -1.2921, lng: 36.8219 };
     if (l.includes('montreal') || l.includes('canada')) return { lat: 45.5017, lng: -73.5673 };
+    if (l.includes('beirut') || l.includes('lebanon')) return { lat: 33.8938, lng: 35.5018 };
+    if (l.includes('delhi') || l.includes('india')) return { lat: 28.6139, lng: 77.2090 };
+    if (l.includes('bogota') || l.includes('colombia')) return { lat: 4.7110, lng: -74.0721 };
     return { lat: 37.7749, lng: -122.4194 };
   };
 
@@ -635,7 +638,7 @@ export const App: React.FC = () => {
               onSelectRequest={(req) => {
                 setSelectedMapRequestId(req.id);
               }}
-              onPlayAudio={(req) => handlePlayRequestAudio(req)}
+              onPlayAudio={(req, langMode) => handlePlayRequestAudio(req, langMode || 'english')}
               isPlayingAudio={isAudioPlaying}
               activePlayingId={activePlayingId}
               onOpenDonateModal={(req, presetSOL) => {

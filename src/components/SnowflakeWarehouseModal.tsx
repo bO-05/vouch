@@ -229,7 +229,7 @@ export const SnowflakeWarehouseModal: React.FC<SnowflakeWarehouseModalProps> = (
               <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#FFFFFF' }}>Snowflake SQL Query Console</span>
             </div>
             {/* Presets */}
-            <div style={{ display: 'flex', gap: 6 }}>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               <button
                 onClick={() => handleSelectPreset('SELECT un_theme, COUNT(*), SUM(amount_sol) FROM VOUCH_WAREHOUSE.PUBLIC.GRANTS GROUP BY 1;')}
                 className="btn btn-secondary"
@@ -243,6 +243,34 @@ export const SnowflakeWarehouseModal: React.FC<SnowflakeWarehouseModalProps> = (
                 style={{ fontSize: '0.68rem', padding: '3px 8px' }}
               >
                 Cortex Anomaly Run
+              </button>
+              <button
+                onClick={() => handleSelectPreset('SELECT SNOWFLAKE.CORTEX.SENTIMENT(description) AS sentiment_score, title FROM VOUCH_WAREHOUSE.PUBLIC.AID_REQUESTS LIMIT 5;')}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.68rem', padding: '3px 8px', color: '#38BDF8' }}
+              >
+                Cortex AI Sentiment
+              </button>
+              <button
+                onClick={() => handleSelectPreset('SELECT SNOWFLAKE.CORTEX.SUMMARIZE(description) AS grant_summary FROM VOUCH_WAREHOUSE.PUBLIC.AID_REQUESTS LIMIT 3;')}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.68rem', padding: '3px 8px', color: '#A855F7' }}
+              >
+                Cortex AI Summary
+              </button>
+              <button
+                onClick={() => handleSelectPreset("SELECT SNOWFLAKE.CORTEX.TRANSLATE(original_transcript, 'es', 'en') FROM VOUCH_WAREHOUSE.PUBLIC.AID_REQUESTS LIMIT 1;")}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.68rem', padding: '3px 8px', color: '#E879F9' }}
+              >
+                Cortex AI Translate
+              </button>
+              <button
+                onClick={() => handleSelectPreset('SHOW TABLES IN VOUCH_WAREHOUSE.PUBLIC;')}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.68rem', padding: '3px 8px', color: '#10B981' }}
+              >
+                Show Tables & Schema
               </button>
             </div>
           </div>
@@ -296,17 +324,31 @@ export const SnowflakeWarehouseModal: React.FC<SnowflakeWarehouseModalProps> = (
             <div style={{
               marginTop: 12,
               padding: '12px 14px',
-              background: 'rgba(16, 185, 129, 0.05)',
-              border: '1px solid rgba(16, 185, 129, 0.25)',
+              background: queryOutput.status === 'ERROR' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.05)',
+              border: queryOutput.status === 'ERROR' ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid rgba(16, 185, 129, 0.25)',
               borderRadius: '8px',
               fontSize: '0.74rem',
               fontFamily: 'var(--font-mono)',
-              color: '#A7F3D0'
+              color: queryOutput.status === 'ERROR' ? '#FCA5A5' : '#A7F3D0'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
-                <span>[SUCCESS] Query ID: {queryOutput.queryId}</span>
+                <span style={{ color: queryOutput.status === 'ERROR' ? '#EF4444' : '#10B981', fontWeight: 700 }}>
+                  [{queryOutput.status}] Query ID: {queryOutput.queryId}
+                </span>
                 <span>Latency: {queryOutput.executionTimeMs}ms • Rows: {queryOutput.rowsProduced}</span>
               </div>
+
+              {queryOutput.message && (
+                <div style={{
+                  marginBottom: 8,
+                  padding: '6px 10px',
+                  background: queryOutput.status === 'ERROR' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                  borderRadius: 4,
+                  color: queryOutput.status === 'ERROR' ? '#FECACA' : '#E2E8F0'
+                }}>
+                  {queryOutput.message}
+                </div>
+              )}
 
               {queryOutput.columns && queryOutput.columns.length > 0 && queryOutput.rows && (
                 <div style={{
