@@ -7,7 +7,7 @@ canonical_url: null
 description: "When a neighbor speaks, trust is verified cryptographically. An elite, fullstack mutual aid platform combining ElevenLabs voice synthesis, Google Gemini 1.5 Flash receipt OCR, Solana Web3 escrows, Snowflake Cortex AI analytics, Open-Meteo climate telemetry, and an interactive global radar map."
 ---
 
-# 🎙️ Vouch (formerly EchoKind): Spoken Need. Cryptographic Trust.
+# 🎙️ Vouch: Spoken Need. Cryptographic Trust.
 
 *Submission for the **[DEV Weekend Challenge: Generosity Edition](https://dev.to/devteam/join-our-dev-weekend-challenge-generosity-edition-1000-in-prizes-across-five-winners-20en)** (September 2026).*
 
@@ -20,7 +20,7 @@ Traditional philanthropic giving has a fundamental empathy and trust dilemma:
 1. **The Form Barrier**: When a storm rips the roof off an elderly neighbor's home in sub-zero winter temperatures, or when an immigrant farmworker family faces unexpected layoffs, they cannot fill out 8-page bureaucratic grant forms. Visually impaired community members, non-English speakers, and distressed neighbors are systematically excluded by standard web inputs.
 2. **The "Black Box" Skepticism**: Donors often hesitate to give because they don't know where their money goes. Will the funds actually reach the community? Will it be spent on what was promised?
 
-**Vouch** (originally prototyped under the working title EchoKind) transforms mutual aid into an authentic, mathematically verifiable human connection:
+**Vouch** transforms mutual aid into an authentic, mathematically verifiable human connection:
 > A neighbor speaks naturally into their phone in their own tongue. Artificial intelligence structures their plea into an itemized care package. ElevenLabs synthesizes empathetic spoken narration. Donors fund micro-grants locked in milestone escrows on Solana. And funds are released **only when Google Gemini VisionGuard Pro validates pharmacy and supermarket receipts line-by-line.**
 
 ---
@@ -136,7 +136,7 @@ npm run demo
 ### CLI Judge Tour Output Sample:
 ```text
 ================================================================================
-   🎙️   V O U C H   (formerly EchoKind)   —   I N T E R A C T I V E   J U D G E   T O U R   🎙️
+   🎙️   V O U C H   —   I N T E R A C T I V E   J U D G E   T O U R   🎙️
    Voice-First Mutual Aid • Verifiable Micro-Grants • Geospatial Radar • Snowflake
 ================================================================================
 [01/12] Solana Devnet Live RPC & Slot Inspection ... ✓ PASS (477ms)
@@ -180,8 +180,8 @@ npm run demo
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/your-username/echokind.git
-cd echokind
+git clone https://github.com/your-username/vouch.git
+cd vouch
 
 # 2. Install dependencies
 npm install

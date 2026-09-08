@@ -727,7 +727,7 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({
             style={{ padding: '10px 24px', opacity: analyzedData ? 1 : 0.5 }}
           >
             <Check size={16} />
-            <span>Publish Multilingual Request to Living Kindness Stream</span>
+            <span>Publish Multilingual Request to Living Mutual Aid Stream</span>
           </button>
         </div>
       </div>

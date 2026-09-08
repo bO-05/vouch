@@ -47,8 +47,12 @@ export const AidCard: React.FC<AidCardProps> = ({
         setAudioProgress(custom.detail.progress);
       }
     };
+    window.addEventListener('vouch-audio-progress', handler);
     window.addEventListener('echokind-audio-progress', handler);
-    return () => window.removeEventListener('echokind-audio-progress', handler);
+    return () => {
+      window.removeEventListener('vouch-audio-progress', handler);
+      window.removeEventListener('echokind-audio-progress', handler);
+    };
   }, [isPlayingAudio]);
 
   const percentFunded = Math.min(100, Math.round((request.raisedAmountSOL / request.targetAmountSOL) * 100));

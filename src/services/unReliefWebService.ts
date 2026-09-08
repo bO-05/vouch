@@ -187,12 +187,13 @@ export class UNReliefWebService {
   }
 
   /**
-   * Fetch the live UN OCHA ReliefWeb crisis feed with optional pagination
+   * Fetch the live UN OCHA ReliefWeb crisis feed with optional pagination and category filtering
    */
-  public static async fetchFeed(options: { limit?: number; offset?: number } = {}): Promise<ReliefWebFeedResponse> {
+  public static async fetchFeed(options: { limit?: number; offset?: number; category?: string } = {}): Promise<ReliefWebFeedResponse> {
     const limit = options.limit ?? 5;
     const offset = options.offset ?? 0;
-    const url = apiUrl(`/api/un-reliefweb/feed?limit=${encodeURIComponent(limit)}&offset=${encodeURIComponent(offset)}`);
+    const categoryParam = options.category && options.category !== 'all' ? `&category=${encodeURIComponent(options.category)}` : '';
+    const url = apiUrl(`/api/un-reliefweb/feed?limit=${encodeURIComponent(limit)}&offset=${encodeURIComponent(offset)}${categoryParam}`);
 
     try {
       const res = await fetch(url);

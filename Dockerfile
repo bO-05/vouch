@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Multi-stage production container for EchoKind
+# Multi-stage production container for Vouch
 
 # -------------------------------------------------------------
 # Stage 1: Frontend & Backend Build

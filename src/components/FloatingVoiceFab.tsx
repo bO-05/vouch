@@ -17,7 +17,7 @@ export const FloatingVoiceFab: React.FC<FloatingVoiceFabProps> = ({
 }) => {
   const [position, setPosition] = useState<Position | null>(() => {
     try {
-      const saved = localStorage.getItem('echokind_fab_position');
+      const saved = localStorage.getItem('vouch_fab_position') || localStorage.getItem('echokind_fab_position');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
@@ -131,7 +131,9 @@ export const FloatingVoiceFab: React.FC<FloatingVoiceFabProps> = ({
       dragStartRef.current = null;
       if (position) {
         try {
-          localStorage.setItem('echokind_fab_position', JSON.stringify(position));
+          const serialized = JSON.stringify(position);
+          localStorage.setItem('vouch_fab_position', serialized);
+          localStorage.removeItem('echokind_fab_position');
         } catch (e) {}
       }
     }
@@ -150,6 +152,7 @@ export const FloatingVoiceFab: React.FC<FloatingVoiceFabProps> = ({
   const handleDoubleClick = () => {
     setPosition(null);
     try {
+      localStorage.removeItem('vouch_fab_position');
       localStorage.removeItem('echokind_fab_position');
     } catch (e) {}
   };

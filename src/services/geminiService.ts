@@ -31,11 +31,12 @@ export interface VerificationResult {
 }
 
 export class GeminiService {
-  private static apiKey: string = localStorage.getItem('echokind_gemini_key') || '';
+  private static apiKey: string = localStorage.getItem('vouch_gemini_key') || localStorage.getItem('echokind_gemini_key') || '';
 
   public static setApiKey(key: string) {
     this.apiKey = key;
-    localStorage.setItem('echokind_gemini_key', key);
+    localStorage.setItem('vouch_gemini_key', key);
+    localStorage.removeItem('echokind_gemini_key');
   }
 
   public static getApiKey(): string {

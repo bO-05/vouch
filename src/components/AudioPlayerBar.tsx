@@ -46,9 +46,13 @@ export const AudioPlayerBar: React.FC<AudioPlayerBarProps> = ({
       }
     };
 
+    window.addEventListener('vouch-audio-progress', handleProgress);
+    window.addEventListener('vouch-audio-state', handleStateChange);
     window.addEventListener('echokind-audio-progress', handleProgress);
     window.addEventListener('echokind-audio-state', handleStateChange);
     return () => {
+      window.removeEventListener('vouch-audio-progress', handleProgress);
+      window.removeEventListener('vouch-audio-state', handleStateChange);
       window.removeEventListener('echokind-audio-progress', handleProgress);
       window.removeEventListener('echokind-audio-state', handleStateChange);
     };

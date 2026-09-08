@@ -18,17 +18,25 @@ export const SystemHealthModal: React.FC<SystemHealthModalProps> = ({
 }) => {
   const [healthData, setHealthData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
   const fetchHealth = () => {
     setIsLoading(true);
+    setFetchError(null);
     fetch(apiUrl('/api/health'))
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Telemetry service returned HTTP ${res.status}`);
+        return res.json();
+      })
       .then(data => {
         setHealthData(data);
         setLastRefreshed(new Date());
       })
-      .catch(err => console.error('Health fetch error:', err))
+      .catch(err => {
+        console.error('Health fetch error:', err);
+        setFetchError(err.message || 'Telemetry connection failed');
+      })
       .finally(() => setIsLoading(false));
   };
 
@@ -50,6 +58,8 @@ export const SystemHealthModal: React.FC<SystemHealthModalProps> = ({
 
   const hasGeminiKey = !!GeminiService.getApiKey() || googleAI?.configured;
   const hasElevenLabsKey = !!ElevenLabsService.getApiKey() || elevenlabs?.configured;
+  const isHealthy = !fetchError && healthData && solana?.status === 'connected';
+  const isConnecting = !fetchError && healthData && solana?.status !== 'connected';
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -63,9 +73,19 @@ export const SystemHealthModal: React.FC<SystemHealthModalProps> = ({
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em' }}>Live Telemetry & Diagnostics</h2>
-                <span className="badge badge-success" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
-                  All Systems Operational
-                </span>
+                {fetchError ? (
+                  <span className="badge" style={{ fontSize: '0.68rem', padding: '2px 8px', background: 'rgba(239, 68, 68, 0.15)', color: '#F87171', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                    Telemetry Offline
+                  </span>
+                ) : isConnecting ? (
+                  <span className="badge" style={{ fontSize: '0.68rem', padding: '2px 8px', background: 'rgba(245, 158, 11, 0.15)', color: '#FCD34D', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                    Subsystems Connecting...
+                  </span>
+                ) : (
+                  <span className="badge badge-success" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
+                    All Systems Operational
+                  </span>
+                )}
               </div>
               <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
                 {ACTIVE_BRAND.name} Protocol Real-Time Oracles, Neural Endpoints & Web3 Cluster Status
@@ -100,6 +120,34 @@ export const SystemHealthModal: React.FC<SystemHealthModalProps> = ({
           </div>
         </div>
 
+        {/* Telemetry Offline Warning Banner */}
+        {fetchError && (
+          <div style={{
+            background: 'rgba(239, 68, 68, 0.08)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '10px 14px',
+            marginBottom: 16,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.8rem', color: '#FCA5A5' }}>
+              <AlertCircle size={16} color="#F87171" />
+              <span>{fetchError}. Target: <code>{apiUrl('/api/health')}</code></span>
+            </div>
+            <button
+              onClick={fetchHealth}
+              disabled={isLoading}
+              className="btn btn-secondary"
+              style={{ padding: '4px 10px', fontSize: '0.72rem' }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* Live Status Matrix Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 12, marginBottom: 20 }}>
           {/* 1. Solana Devnet */}
@@ -114,9 +162,16 @@ export const SystemHealthModal: React.FC<SystemHealthModalProps> = ({
                 <Coins size={16} color="#14F195" />
                 <strong style={{ fontSize: '0.88rem', color: '#FFFFFF' }}>Solana Devnet Cluster</strong>
               </div>
-              <span className="badge" style={{ background: 'rgba(20, 241, 149, 0.12)', color: '#14F195', fontSize: '0.68rem', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#14F195' }} />
-                <span>Active Consensus</span>
+              <span className="badge" style={{
+                background: solana?.status === 'connected' ? 'rgba(20, 241, 149, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+                color: solana?.status === 'connected' ? '#14F195' : '#FCD34D',
+                fontSize: '0.68rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: solana?.status === 'connected' ? '#14F195' : '#F59E0B' }} />
+                <span>{solana?.status === 'connected' ? 'Active Consensus' : 'Connecting...'}</span>
               </span>
             </div>
             <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
@@ -144,8 +199,13 @@ export const SystemHealthModal: React.FC<SystemHealthModalProps> = ({
               </span>
             </div>
             <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
-              • Feed: <strong>CoinGecko + Coinbase Dual Feed</strong><br />
-              • Live Price: <strong style={{ color: '#34D399' }}>${solana?.livePriceUSD ? solana.livePriceUSD.toFixed(2) : '106.43'} USD</strong><br />
+              • Feed: <strong>{solana?.priceSource || 'CoinGecko + Coinbase Dual Feed'}</strong><br />
+              • Live Price: <strong style={{ color: '#34D399' }}>${solana?.livePriceUSD ? solana.livePriceUSD.toFixed(2) : '103.18'} USD</strong>
+              {solana?.priceChange24h !== undefined && (
+                <span style={{ color: solana.priceChange24h >= 0 ? '#34D399' : '#F87171', marginLeft: 6, fontSize: '0.72rem' }}>
+                  ({solana.priceChange24h >= 0 ? '+' : ''}{solana.priceChange24h.toFixed(2)}% 24h)
+                </span>
+              )}<br />
               • Frequency: Real-time query refreshed every 30s
             </p>
           </div>
@@ -162,17 +222,36 @@ export const SystemHealthModal: React.FC<SystemHealthModalProps> = ({
                 <Sparkles size={16} color={hasGeminiKey ? '#60A5FA' : '#F59E0B'} />
                 <strong style={{ fontSize: '0.88rem', color: '#FFFFFF' }}>Google Gemini 1.5 Flash</strong>
               </div>
-              <span className="badge" style={{
-                background: hasGeminiKey ? 'rgba(96, 165, 250, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                color: hasGeminiKey ? '#93C5FD' : '#FCD34D',
-                fontSize: '0.68rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5
-              }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: hasGeminiKey ? '#60A5FA' : '#F59E0B' }} />
-                <span>{hasGeminiKey ? 'Live Cloud API' : 'Local Fallback'}</span>
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {!hasGeminiKey && onOpenKeysModal && (
+                  <button
+                    type="button"
+                    onClick={() => { onClose(); onOpenKeysModal(); }}
+                    style={{
+                      background: 'rgba(245, 158, 11, 0.15)',
+                      border: '1px solid rgba(245, 158, 11, 0.35)',
+                      borderRadius: '4px',
+                      padding: '2px 7px',
+                      color: '#FCD34D',
+                      fontSize: '0.68rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    + Add Key
+                  </button>
+                )}
+                <span className="badge" style={{
+                  background: hasGeminiKey ? 'rgba(96, 165, 250, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                  color: hasGeminiKey ? '#93C5FD' : '#FCD34D',
+                  fontSize: '0.68rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: hasGeminiKey ? '#60A5FA' : '#F59E0B' }} />
+                  <span>{hasGeminiKey ? 'Live Cloud API' : 'Local Fallback'}</span>
+                </span>
+              </div>
             </div>
             <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
               • Voice-to-Need Structuring &amp; Multilingual Bridge<br />
@@ -193,17 +272,36 @@ export const SystemHealthModal: React.FC<SystemHealthModalProps> = ({
                 <Volume2 size={16} color={hasElevenLabsKey ? '#FB7185' : '#F59E0B'} />
                 <strong style={{ fontSize: '0.88rem', color: '#FFFFFF' }}>ElevenLabs Multilingual v2</strong>
               </div>
-              <span className="badge" style={{
-                background: hasElevenLabsKey ? 'rgba(251, 113, 133, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                color: hasElevenLabsKey ? '#FDA4AF' : '#FCD34D',
-                fontSize: '0.68rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5
-              }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: hasElevenLabsKey ? '#FB7185' : '#F59E0B' }} />
-                <span>{hasElevenLabsKey ? 'Live Neural Voice' : 'Browser Web Speech'}</span>
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {!hasElevenLabsKey && onOpenKeysModal && (
+                  <button
+                    type="button"
+                    onClick={() => { onClose(); onOpenKeysModal(); }}
+                    style={{
+                      background: 'rgba(245, 158, 11, 0.15)',
+                      border: '1px solid rgba(245, 158, 11, 0.35)',
+                      borderRadius: '4px',
+                      padding: '2px 7px',
+                      color: '#FCD34D',
+                      fontSize: '0.68rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    + Add Key
+                  </button>
+                )}
+                <span className="badge" style={{
+                  background: hasElevenLabsKey ? 'rgba(251, 113, 133, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                  color: hasElevenLabsKey ? '#FDA4AF' : '#FCD34D',
+                  fontSize: '0.68rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: hasElevenLabsKey ? '#FB7185' : '#F59E0B' }} />
+                  <span>{hasElevenLabsKey ? 'Live Neural Voice' : 'Browser Web Speech'}</span>
+                </span>
+              </div>
             </div>
             <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
               • Audio Storytelling: Rachel, Adam, Marcela, Olena, Antoni<br />
@@ -254,8 +352,8 @@ export const SystemHealthModal: React.FC<SystemHealthModalProps> = ({
               </span>
             </div>
             <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
-              • Source: <code style={{ color: '#38BDF8' }}>api.reliefweb.int/v2</code><br />
-              • Live disaster flash updates (Ukraine, Horn of Africa, Madagascar)<br />
+              • Source: <code style={{ color: '#38BDF8' }}>api.reliefweb.int + gdacs.org</code><br />
+              • Live disaster flash updates ({unRelief?.activeDisastersTracked || 8}+ active global crises)<br />
               • 1-Click direct ingestion into community aid stream
             </p>
           </div>
@@ -298,13 +396,13 @@ export const SystemHealthModal: React.FC<SystemHealthModalProps> = ({
               </div>
               <span className="badge" style={{ background: 'rgba(41, 181, 232, 0.12)', color: '#29B5E8', fontSize: '0.68rem', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#29B5E8' }} />
-                <span>Cluster Active</span>
+                <span>{snowflake?.liveWarehouseConnected ? 'Live Cloud Connected' : 'Virtual Shadow Compute Active'}</span>
               </span>
             </div>
             <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
-              • Cluster: <code style={{ color: '#29B5E8' }}>ECHOKIND_ANALYTICS_WH</code> (AWS_US_WEST_2)<br />
+              • Cluster: <code style={{ color: '#29B5E8' }}>{snowflake?.warehouse || 'VOUCH_ANALYTICS_WH'}</code> ({snowflake?.region || 'AWS_US_WEST_2'})<br />
               • Cortex AI Model: <code style={{ color: '#29B5E8' }}>snowflake-cortex-arctic-instruct</code><br />
-              • Grant velocity, UN theme distribution &amp; interactive SQL terminal
+              • Status: {snowflake?.liveWarehouseConnected ? 'Enterprise Snowflake REST API live' : 'Cortex Arctic shadow compute engine active'}
             </p>
           </div>
         </div>

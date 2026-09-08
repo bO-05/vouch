@@ -1,10 +1,14 @@
 /**
- * Vouch (formerly EchoKind) End-to-End Integration Test Suite
+ * Vouch End-to-End Integration Test Suite
  * DEV Weekend Challenge: Generosity Edition
  * "Spoken Need. Cryptographic Trust."
  */
 
-const SERVER_BASE = process.env.TEST_SERVER_URL || 'http://localhost:3001';
+const rawServerBase = process.env.TEST_SERVER_URL || 'http://127.0.0.1:3001';
+// Cross-version Node 18 & 20 compatibility: Node 18 built-in fetch resolves 'localhost' to IPv6 ::1
+// without Happy Eyeballs autoSelectFamily fallback, causing ECONNREFUSED against IPv4 listeners.
+// Automatically normalize localhost to 127.0.0.1 for deterministic, rock-solid execution.
+const SERVER_BASE = rawServerBase.replace(/:\/\/localhost\b/, '://127.0.0.1');
 const SOLANA_RPC = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
 
 let testsPassed = 0;
@@ -289,12 +293,12 @@ async function runTests() {
     const data = await res.json();
     if (data.request?.id && data.request?.category) {
       unIngestedRequestId = data.request.id;
-      logPass('Ingest UN Crisis into EchoKind Living Stream', `Created Ticket ID: ${data.request.id}, Title: "${data.request.title}", SOL Target: ${data.request.targetAmountSOL} SOL`);
+      logPass('Ingest UN Crisis into Vouch Living Stream', `Created Ticket ID: ${data.request.id}, Title: "${data.request.title}", SOL Target: ${data.request.targetAmountSOL} SOL`);
     } else {
       throw new Error(`UN crisis ingestion failed: ${JSON.stringify(data)}`);
     }
   } catch (err) {
-    logFail('Ingest UN Crisis into EchoKind Living Stream', err.message);
+    logFail('Ingest UN Crisis into Vouch Living Stream', err.message);
   }
 
   // Test 12: Gemini VisionGuard Pro - Deep Receipt & Inventory OCR
@@ -356,7 +360,7 @@ async function runTests() {
   try {
     const res = await fetch(`${SERVER_BASE}/api/snowflake/metrics`);
     const data = await res.json();
-    if ((data.warehouseName === 'VOUCH_ANALYTICS_WH' || data.warehouseName === 'ECHOKIND_ANALYTICS_WH') && data.cortexAIStatus?.model && Array.isArray(data.themeBreakdown)) {
+    if (data.warehouseName === 'VOUCH_ANALYTICS_WH' && data.cortexAIStatus?.model && Array.isArray(data.themeBreakdown)) {
       logPass('Snowflake Generosity Warehouse & Cortex AI Metrics', `Warehouse: ${data.warehouseName}, Cluster: ${data.clusterStatus}, Model: ${data.cortexAIStatus.model}, Themes: ${data.themeBreakdown.length}, Total SOL: ${data.totalSOLProcessed}`);
     } else {
       throw new Error(`Unexpected Snowflake metrics response: ${JSON.stringify(data)}`);

@@ -17,8 +17,10 @@ export const PROTOCOL_ESCROW_VAULT = 'J5Q5PG75xeeFecNriPj4FEXuK5qcVz6sZjYTDh2rpZ
 
 export class SolanaService {
   public static RPC_ENDPOINT = SOLANA_RPC_URL;
-  private static STORAGE_KEY = 'echokind_solana_wallet';
-  private static GRANTS_KEY = 'echokind_micro_grants';
+  private static STORAGE_KEY = 'vouch_solana_wallet';
+  private static LEGACY_STORAGE_KEY = 'echokind_solana_wallet';
+  private static GRANTS_KEY = 'vouch_micro_grants';
+  private static LEGACY_GRANTS_KEY = 'echokind_micro_grants';
 
   private static lastKnownPrice: SolanaPriceData = {
     priceUSD: 102.35,
@@ -191,7 +193,7 @@ export class SolanaService {
    * Get or generate local Devnet keypair representation
    */
   public static getWallet(): WalletState {
-    const saved = localStorage.getItem(this.STORAGE_KEY);
+    const saved = localStorage.getItem(this.STORAGE_KEY) || localStorage.getItem(this.LEGACY_STORAGE_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -224,12 +226,14 @@ export class SolanaService {
       isSponsorRelayerActive: true
     };
 
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(defaultWallet));
+    this.saveWallet(defaultWallet);
     return defaultWallet;
   }
 
   public static saveWallet(wallet: WalletState) {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(wallet));
+    const serialized = JSON.stringify(wallet);
+    localStorage.setItem(this.STORAGE_KEY, serialized);
+    localStorage.removeItem(this.LEGACY_STORAGE_KEY);
   }
 
   /**
@@ -392,7 +396,7 @@ export class SolanaService {
 
         const existingGrants = this.getAllGrants();
         existingGrants.unshift(grant);
-        localStorage.setItem(this.GRANTS_KEY, JSON.stringify(existingGrants));
+        this.saveGrants(existingGrants);
 
         return grant;
       } catch (phantomErr: any) {
@@ -432,7 +436,7 @@ export class SolanaService {
 
           const existingGrants = this.getAllGrants();
           existingGrants.unshift(data.grant);
-          localStorage.setItem(this.GRANTS_KEY, JSON.stringify(existingGrants));
+          this.saveGrants(existingGrants);
 
           return data.grant;
         }
@@ -500,13 +504,19 @@ export class SolanaService {
 
     const existingGrants = this.getAllGrants();
     existingGrants.unshift(fallbackGrant);
-    localStorage.setItem(this.GRANTS_KEY, JSON.stringify(existingGrants));
+    this.saveGrants(existingGrants);
 
     return fallbackGrant;
   }
 
+  private static saveGrants(grants: MicroGrant[]): void {
+    const serialized = JSON.stringify(grants);
+    localStorage.setItem(this.GRANTS_KEY, serialized);
+    localStorage.removeItem(this.LEGACY_GRANTS_KEY);
+  }
+
   public static getAllGrants(): MicroGrant[] {
-    const saved = localStorage.getItem(this.GRANTS_KEY);
+    const saved = localStorage.getItem(this.GRANTS_KEY) || localStorage.getItem(this.LEGACY_GRANTS_KEY);
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -525,7 +535,7 @@ export class SolanaService {
       }
       return g;
     });
-    localStorage.setItem(this.GRANTS_KEY, JSON.stringify(updated));
+    this.saveGrants(updated);
   }
 
   /**

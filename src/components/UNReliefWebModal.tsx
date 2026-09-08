@@ -10,6 +10,14 @@ interface UNReliefWebModalProps {
   onIngestSuccess: (newReq: AidRequest) => void;
 }
 
+const CRISIS_CATEGORIES = [
+  { id: 'all', label: 'All Crises' },
+  { id: 'severe', label: '🚨 Severe Alerts (Red/Orange)' },
+  { id: 'seismic', label: '🌋 Volcano & Seismic' },
+  { id: 'floods', label: '🌊 Floods & Storms' },
+  { id: 'drought', label: '☀️ Drought & Climate' },
+];
+
 export const UNReliefWebModal: React.FC<UNReliefWebModalProps> = ({
   isOpen,
   onClose,
@@ -18,7 +26,9 @@ export const UNReliefWebModal: React.FC<UNReliefWebModalProps> = ({
   const [reports, setReports] = useState<UNCrisisReport[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [ingestingId, setIngestingId] = useState<string | null>(null);
+  const [isIngestingAll, setIsIngestingAll] = useState<boolean>(false);
   const [ingestedIds, setIngestedIds] = useState<Record<string, boolean>>({});
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [page, setPage] = useState<number>(0);
   const [pageSize] = useState<number>(3);
   const [totalCount, setTotalCount] = useState<number>(3);
@@ -28,7 +38,7 @@ export const UNReliefWebModal: React.FC<UNReliefWebModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setIsLoading(true);
-      UNReliefWebService.fetchFeed({ limit: pageSize, offset: page * pageSize })
+      UNReliefWebService.fetchFeed({ limit: pageSize, offset: page * pageSize, category: selectedCategory })
         .then(data => {
           if (Array.isArray(data.reports)) {
             setReports(data.reports);
@@ -40,7 +50,7 @@ export const UNReliefWebModal: React.FC<UNReliefWebModalProps> = ({
         .catch(err => console.error('Failed to fetch UN feed:', err))
         .finally(() => setIsLoading(false));
     }
-  }, [isOpen, page, pageSize]);
+  }, [isOpen, page, pageSize, selectedCategory]);
 
   if (!isOpen) return null;
 
@@ -60,10 +70,16 @@ export const UNReliefWebModal: React.FC<UNReliefWebModalProps> = ({
   };
 
   const handleIngestAll = async () => {
-    for (const report of reports) {
-      if (!ingestedIds[report.id]) {
-        await handleIngestReport(report);
+    if (isIngestingAll || isLoading || !!ingestingId) return;
+    setIsIngestingAll(true);
+    try {
+      for (const report of reports) {
+        if (!ingestedIds[report.id]) {
+          await handleIngestReport(report);
+        }
       }
+    } finally {
+      setIsIngestingAll(false);
     }
   };
 
@@ -147,13 +163,54 @@ export const UNReliefWebModal: React.FC<UNReliefWebModalProps> = ({
           <button
             type="button"
             onClick={handleIngestAll}
-            disabled={isLoading}
+            disabled={isLoading || isIngestingAll || !!ingestingId}
             className="btn btn-solana"
             style={{ padding: '6px 14px', fontSize: '0.76rem' }}
           >
-            <Sparkles size={13} />
-            <span>Ingest All Live Reports</span>
+            {isIngestingAll ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
+            <span>{isIngestingAll ? 'Ingesting Reports...' : 'Ingest All Live Reports'}</span>
           </button>
+        </div>
+
+        {/* Category Filter Pills */}
+        <div style={{
+          display: 'flex',
+          gap: 6,
+          marginBottom: 16,
+          flexWrap: 'wrap',
+          alignItems: 'center'
+        }}>
+          {CRISIS_CATEGORIES.map(cat => {
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => {
+                  if (selectedCategory !== cat.id) {
+                    setSelectedCategory(cat.id);
+                    setPage(0);
+                  }
+                }}
+                style={{
+                  background: isSelected ? 'rgba(56, 189, 248, 0.16)' : 'rgba(255, 255, 255, 0.04)',
+                  border: isSelected ? '1px solid #38BDF8' : '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-full)',
+                  padding: '4px 11px',
+                  fontSize: '0.72rem',
+                  fontWeight: isSelected ? 600 : 400,
+                  color: isSelected ? '#38BDF8' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <span>{cat.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Disaster Reports List */}

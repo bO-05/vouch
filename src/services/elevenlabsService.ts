@@ -47,7 +47,7 @@ export const AVAILABLE_VOICES: VoiceOption[] = [
 ];
 
 export class ElevenLabsService {
-  private static apiKey: string = localStorage.getItem('echokind_elevenlabs_key') || '';
+  private static apiKey: string = localStorage.getItem('vouch_elevenlabs_key') || localStorage.getItem('echokind_elevenlabs_key') || '';
   private static currentAudio: HTMLAudioElement | null = null;
   private static activeUtterance: SpeechSynthesisUtterance | null = null;
   private static cachedVoices: SpeechSynthesisVoice[] = [];
@@ -78,7 +78,8 @@ export class ElevenLabsService {
 
   public static setApiKey(key: string) {
     this.apiKey = key;
-    localStorage.setItem('echokind_elevenlabs_key', key);
+    localStorage.setItem('vouch_elevenlabs_key', key);
+    localStorage.removeItem('echokind_elevenlabs_key');
   }
 
   public static getApiKey(): string {
@@ -111,14 +112,21 @@ export class ElevenLabsService {
 
   public static notifyStateChange(isPlaying: boolean) {
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('echokind-audio-state', {
-        detail: {
-          isPlaying,
-          engine: this.activeEngine,
-          voiceLabel: this.activeVoiceLabel,
-          voiceId: this.activeVoiceId
-        }
-      }));
+      const detail = {
+        isPlaying,
+        engine: this.activeEngine,
+        voiceLabel: this.activeVoiceLabel,
+        voiceId: this.activeVoiceId
+      };
+      window.dispatchEvent(new CustomEvent('vouch-audio-state', { detail }));
+      window.dispatchEvent(new CustomEvent('echokind-audio-state', { detail }));
+    }
+  }
+
+  public static notifyProgress(detail: any) {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('vouch-audio-progress', { detail }));
+      window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail }));
     }
   }
 
@@ -183,9 +191,7 @@ export class ElevenLabsService {
           if (audio.duration) {
             const pct = Math.min(100, Math.round((audio.currentTime / audio.duration) * 100));
             this.currentProgress = pct;
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: pct } }));
-            }
+            this.notifyProgress({ progress: pct });
           }
         };
         audio.onended = () => {
@@ -194,9 +200,7 @@ export class ElevenLabsService {
           this.activeEngine = 'idle';
           this.currentProgress = 100;
           this.notifyStateChange(false);
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: 100 } }));
-          }
+          this.notifyProgress({ progress: 100 });
           onEnded?.();
         };
         audio.onerror = (e) => {
@@ -268,9 +272,7 @@ export class ElevenLabsService {
             if (audio.duration) {
               const pct = Math.min(100, Math.round((audio.currentTime / audio.duration) * 100));
               this.currentProgress = pct;
-              if (typeof window !== 'undefined') {
-                window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: pct } }));
-              }
+              this.notifyProgress({ progress: pct });
             }
           };
           audio.onended = () => {
@@ -279,9 +281,7 @@ export class ElevenLabsService {
             this.activeEngine = 'idle';
             this.currentProgress = 100;
             this.notifyStateChange(false);
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: 100 } }));
-            }
+            this.notifyProgress({ progress: 100 });
             onEnded?.();
           };
           audio.onerror = (e) => {
@@ -446,7 +446,7 @@ export class ElevenLabsService {
         if (text.length > 0 && e.charIndex !== undefined) {
           const pct = Math.min(100, Math.round((e.charIndex / text.length) * 100));
           this.currentProgress = pct;
-          window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: pct, charIndex: e.charIndex } }));
+          this.notifyProgress({ progress: pct, charIndex: e.charIndex });
         }
       };
 
@@ -475,11 +475,11 @@ export class ElevenLabsService {
           const calcPct = Math.min(96, Math.round((elapsed / estimatedDurationMs) * 100));
           if (calcPct > this.currentProgress) {
             this.currentProgress = calcPct;
-            window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: calcPct } }));
+            this.notifyProgress({ progress: calcPct });
           }
         }, 200);
 
-        window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: 5 } }));
+        this.notifyProgress({ progress: 5 });
       };
 
       utterance.onend = () => {
@@ -491,7 +491,7 @@ export class ElevenLabsService {
         this.activeEngine = 'idle';
         this.currentProgress = 100;
         this.notifyStateChange(false);
-        window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: 100 } }));
+        this.notifyProgress({ progress: 100 });
         onEnded?.();
       };
 
@@ -539,9 +539,7 @@ export class ElevenLabsService {
     this.activeEngine = 'idle';
     this.currentProgress = 0;
     this.notifyStateChange(false);
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: 0 } }));
-    }
+    ElevenLabsService.notifyProgress({ progress: 0 });
   }
 
   public static isAudioPlaying(): boolean {
@@ -583,7 +581,7 @@ export class ElevenLabsService {
               const globalChar = cleanIndex + e.charIndex;
               const pct = Math.min(100, Math.round((globalChar / this.activeText.length) * 100));
               this.currentProgress = pct;
-              window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: pct, charIndex: globalChar } }));
+              ElevenLabsService.notifyProgress({ progress: pct, charIndex: globalChar });
             }
           };
 
@@ -603,7 +601,7 @@ export class ElevenLabsService {
             const calcPct = Math.min(96, Math.round((elapsed / this.estimatedDurationMs) * 100));
             if (calcPct > this.currentProgress) {
               this.currentProgress = calcPct;
-              window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: calcPct } }));
+              ElevenLabsService.notifyProgress({ progress: calcPct });
             }
           }, 200);
 
@@ -619,8 +617,6 @@ export class ElevenLabsService {
         this.stopAudio();
       }
     }
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('echokind-audio-progress', { detail: { progress: clamped } }));
-    }
+    ElevenLabsService.notifyProgress({ progress: clamped });
   }
 }

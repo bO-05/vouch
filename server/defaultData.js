@@ -1,5 +1,5 @@
 /**
- * EchoKind Default Verified Community Aid Requests
+ * Vouch Default Verified Community Aid Requests
  * Used for automated self-healing & persistent database seeding
  */
 
@@ -286,7 +286,7 @@ export const DEFAULT_AID_REQUESTS = [
       { id: 'i-16', name: 'Heavy-Duty Cargo Bike Trailer', quantity: 2, unit: 'trailers', fulfilled: true, estimatedCostUSD: 800 },
       { id: 'i-17', name: 'Insulated Medicine Delivery Panniers', quantity: 4, unit: 'bags', fulfilled: true, estimatedCostUSD: 320 }
     ],
-    voiceNarrationText: "For many of our elderly neighbors, our volunteer courier is the only friendly voice they hear all week. Thanks to the EchoKind community, our cargo trailers were completely funded! We delivered 84 grocery packages and prescriptions in the last 7 days alone.",
+    voiceNarrationText: "For many of our elderly neighbors, our volunteer courier is the only friendly voice they hear all week. Thanks to the Vouch community, our cargo trailers were completely funded! We delivered 84 grocery packages and prescriptions in the last 7 days alone.",
     audioDurationSec: 21,
     imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1000&q=80',
     verifiedProofImageUrl: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=800&q=80',

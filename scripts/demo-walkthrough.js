@@ -1,5 +1,5 @@
 /**
- * EchoKind Interactive Judge Tour CLI Runner
+ * Vouch Interactive Judge Tour CLI Runner
  * DEV Weekend Challenge: Generosity Edition (September 2026)
  *
  * Runs the full 12-stage lifecycle of verifiable mutual aid:
@@ -8,7 +8,8 @@
  * Proof Certificate -> ProPublica 501(c)(3) -> Snowflake Cortex Warehouse.
  */
 
-const SERVER_BASE = process.env.TEST_SERVER_URL || 'http://localhost:3001';
+const rawServerBase = process.env.TEST_SERVER_URL || 'http://127.0.0.1:3001';
+const SERVER_BASE = rawServerBase.replace(/:\/\/localhost\b/, '://127.0.0.1');
 const SOLANA_RPC = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
 
 const C = {
@@ -31,7 +32,7 @@ function sleep(ms) {
 
 function printBanner() {
   console.log(`\n${C.amber}${C.bright}================================================================================${C.reset}`);
-  console.log(`${C.cyan}${C.bright}   🎙️   V O U C H   (formerly EchoKind)   —   I N T E R A C T I V E   J U D G E   T O U R   🎙️${C.reset}`);
+  console.log(`${C.cyan}${C.bright}   🎙️   V O U C H   —   I N T E R A C T I V E   J U D G E   T O U R   🎙️${C.reset}`);
   console.log(`${C.dim}   Voice-First Mutual Aid • Verifiable Micro-Grants • Geospatial Radar • Snowflake${C.reset}`);
   console.log(`${C.amber}${C.bright}================================================================================${C.reset}`);
   console.log(`   ${C.gray}Target Backend:${C.reset} ${SERVER_BASE}`);

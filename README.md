@@ -1,4 +1,4 @@
-# 🎙️ Vouch (formerly EchoKind) — Spoken Need. Cryptographic Trust.
+# 🎙️ Vouch — Spoken Need. Cryptographic Trust.
 
 > **When a neighbor speaks, trust is verified cryptographically.**  
 > Built for the [DEV Weekend Challenge: Generosity Edition](https://dev.to/devteam/join-our-dev-weekend-challenge-generosity-edition-1000-in-prizes-across-five-winners-20en) (September 2026).
@@ -17,7 +17,7 @@
 
 ## 💡 Overview
 
-**Vouch** (originally prototyped under the working title EchoKind) is an elite, production-grade community mutual aid and disaster relief platform that transforms philanthropic giving from cold, bureaucratic donation forms into an empathetic, transparent human network.
+**Vouch** is an elite, production-grade community mutual aid and disaster relief platform that transforms philanthropic giving from cold, bureaucratic donation forms into an empathetic, transparent human network.
 
 Marginalized individuals—such as visually impaired seniors, non-literate community members, non-English speakers, or disaster victims in sub-zero freezes—are frequently excluded by complex online web forms. Furthermore, donors hesitate to give because they cannot verify whether their funds actually reach the community on the ground.
 
@@ -137,7 +137,7 @@ flowchart TD
 - **AI Engine**: Google Gemini 1.5 Flash (Multimodal vision OCR, translation, dialect extraction)
 - **Voice Engine**: ElevenLabs API (`eleven_multilingual_v2`) with audio streaming and local disk caching
 - **Web3 Protocol**: Solana Devnet JSON-RPC, Solana Pay Standard, SPL token/escrow architecture
-- **Data Warehouse**: Snowflake Virtual Warehouse simulation (`ECHOKIND_ANALYTICS_WH`) with Cortex AI
+- **Data Warehouse**: Snowflake Virtual Warehouse simulation (`VOUCH_ANALYTICS_WH`) with Cortex AI
 - **Climate Oracle**: Open-Meteo API for real-time weather and temperature telemetry
 - **Charity Verification**: ProPublica Nonprofit Explorer API for IRS Form 990 transparency
 
@@ -150,7 +150,7 @@ flowchart TD
 
 ### Quick Start (Zero Setup Required)
 
-EchoKind includes authentic heuristic fallbacks, pre-funded Devnet balances, and cached sample streams so judges can test every feature instantly without configuring API keys:
+Vouch includes authentic heuristic fallbacks, pre-funded Devnet balances, and cached sample streams so judges can test every feature instantly without configuring API keys:
 
 ```bash
 # 1. Install dependencies
@@ -162,7 +162,7 @@ npm run server
 # 3. In another terminal, start the Frontend (Port 5173)
 npm run dev
 
-# 4. Run the Full Automated Integration Test Suite (18 Tests)
+# 4. Run the Full Automated Integration Test Suite (23 Tests)
 npm run test:e2e
 ```
 
@@ -172,7 +172,7 @@ Visit `http://localhost:5173` in your browser.
 
 ## 🧪 Automated Integration Tests
 
-EchoKind includes a comprehensive 18-step end-to-end integration test suite verifying every component against live external APIs and the Solana blockchain:
+Vouch includes a comprehensive 23-step end-to-end integration test suite verifying every component against live external APIs and the Solana blockchain:
 
 ```bash
 npm run test:e2e
@@ -181,7 +181,7 @@ npm run test:e2e
 ### Test Suite Execution Output:
 ```text
 ====================================================
-🧪 Starting EchoKind End-to-End Integration Tests
+🧪 Starting Vouch Protocol End-to-End Integration Tests
 Target Backend: http://localhost:3001
 Target Solana RPC: https://api.devnet.solana.com
 ====================================================
@@ -206,7 +206,7 @@ Target Solana RPC: https://api.devnet.solana.com
        -> Price: $102.33 USD, 24h: 1.11%, Lamports/USD: 9.772.305, Source: CoinGecko Live Feed
 [PASS] UN OCHA ReliefWeb Humanitarian Crisis Feed
        -> Source: UN OCHA ReliefWeb Global Crisis Feed, Reports Active: 3, Sample: "Ukraine Winter Emergency: Sub-Zero Freeze & Power Grid Damage"
-[PASS] Ingest UN Crisis into EchoKind Living Stream
+[PASS] Ingest UN Crisis into Vouch Living Stream
        -> Created Ticket ID: rw-ukraine-winter-2026, Title: "Ukraine Winter Emergency: Sub-Zero Freeze & Power Grid Damage", SOL Target: 4.8 SOL
 [PASS] Gemini VisionGuard Pro: Deep Receipt OCR
        -> Store: CVS Health Community Pharmacy #8412, Total: $570, Confidence: 98%, Escrow Unlocked: true

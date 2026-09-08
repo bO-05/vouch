@@ -27,7 +27,7 @@ import { apiUrl } from './config/api';
 export const App: React.FC = () => {
   // Main Data States
   const [requests, setRequests] = useState<AidRequest[]>(() => {
-    const saved = localStorage.getItem('echokind_requests');
+    const saved = localStorage.getItem('vouch_requests') || localStorage.getItem('echokind_requests');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -136,7 +136,9 @@ export const App: React.FC = () => {
 
   // Persist requests to localStorage as client cache
   useEffect(() => {
-    localStorage.setItem('echokind_requests', JSON.stringify(requests));
+    const serialized = JSON.stringify(requests);
+    localStorage.setItem('vouch_requests', serialized);
+    localStorage.removeItem('echokind_requests');
   }, [requests]);
 
   // Sync wallet
@@ -680,7 +682,7 @@ export const App: React.FC = () => {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <h2 style={{ fontSize: '1.6rem', fontWeight: 800 }}>
-                  Living Kindness Stream
+                  Living Mutual Aid Stream
                 </h2>
                 <button
                   onClick={() => setViewMode('map')}
