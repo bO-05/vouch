@@ -15,6 +15,30 @@ export interface WalletState {
 
 export const PROTOCOL_ESCROW_VAULT = 'J5Q5PG75xeeFecNriPj4FEXuK5qcVz6sZjYTDh2rpZDG';
 
+export interface VerificationDetail {
+  found: boolean;
+  isOnChain: boolean;
+  slot?: number;
+  blockTime?: number;
+  status: string;
+  network: string;
+  simulationReason?: string;
+  isDirectRecipientTransfer?: boolean;
+  directTransferAmountSOL?: number;
+  senderAddress?: string | null;
+  isSponsorRelayerProxy?: boolean;
+  relayerMode?: string;
+  verificationVerdict?: string;
+  recipientVault?: string;
+  recipientVaultBalanceSOL?: number;
+  isEscrowLocked?: boolean;
+  grantId?: string;
+  grantAmountSOL?: number;
+  sponsorBadge?: string;
+  explorerUrl?: string;
+  solscanUrl?: string;
+}
+
 export class SolanaService {
   public static RPC_ENDPOINT = SOLANA_RPC_URL;
   private static STORAGE_KEY = 'vouch_solana_wallet';
@@ -581,17 +605,10 @@ export class SolanaService {
   /**
    * Live On-Chain Transaction Verification via RPC or backend proxy
    */
-  public static async verifyTransaction(txSignature: string): Promise<{
-    found: boolean;
-    isOnChain: boolean;
-    slot?: number;
-    blockTime?: number;
-    status: string;
-    network: string;
-    simulationReason?: string;
-  }> {
+  public static async verifyTransaction(txSignature: string, recipient?: string): Promise<VerificationDetail> {
     try {
-      const res = await fetch(apiUrl(`/api/solana/verify-tx/${encodeURIComponent(txSignature)}`));
+      const url = apiUrl(`/api/solana/verify-tx/${encodeURIComponent(txSignature)}${recipient ? `?recipient=${encodeURIComponent(recipient)}` : ''}`);
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         return {
@@ -601,7 +618,21 @@ export class SolanaService {
           blockTime: data.blockTime,
           status: data.status,
           network: data.network || 'devnet',
-          simulationReason: data.simulationReason
+          simulationReason: data.simulationReason,
+          isDirectRecipientTransfer: data.isDirectRecipientTransfer,
+          directTransferAmountSOL: data.directTransferAmountSOL,
+          senderAddress: data.senderAddress,
+          isSponsorRelayerProxy: data.isSponsorRelayerProxy,
+          relayerMode: data.relayerMode,
+          verificationVerdict: data.verificationVerdict,
+          recipientVault: data.recipientVault || recipient,
+          recipientVaultBalanceSOL: data.recipientVaultBalanceSOL,
+          isEscrowLocked: data.isEscrowLocked,
+          grantId: data.grantId,
+          grantAmountSOL: data.grantAmountSOL,
+          sponsorBadge: data.sponsorBadge,
+          explorerUrl: data.explorerUrl,
+          solscanUrl: data.solscanUrl
         };
       }
     } catch {}
@@ -609,6 +640,76 @@ export class SolanaService {
     // Fallback: Query Solana Devnet JSON-RPC directly from client
     try {
       const connection = new Connection(this.RPC_ENDPOINT, 'confirmed');
+      let vaultBal: number | undefined;
+      if (recipient) {
+        try {
+          const b = await connection.getBalance(new PublicKey(recipient));
+          vaultBal = Number((b / LAMPORTS_PER_SOL).toFixed(6));
+        } catch {}
+      }
+
+      const tx = await connection.getParsedTransaction(txSignature, { commitment: 'confirmed' });
+      if (tx) {
+        let isDirect = false;
+        let directAmt = 0;
+        let sender: string | null = null;
+        if (recipient && tx.transaction?.message?.instructions) {
+          for (const ix of tx.transaction.message.instructions) {
+            if ((ix as any).program === 'system' && (ix as any).parsed?.type === 'transfer') {
+              const info = (ix as any).parsed?.info;
+              if (info?.destination === recipient) {
+                isDirect = true;
+                directAmt = Number((((info.lamports || 0) / LAMPORTS_PER_SOL)).toFixed(4));
+                sender = info.source;
+              }
+            }
+          }
+        }
+        if (!isDirect && recipient && (tx.meta as any)?.innerInstructions) {
+          for (const inner of (tx.meta as any).innerInstructions) {
+            for (const ix of inner.instructions || []) {
+              if (ix.program === 'system' && ix.parsed?.type === 'transfer') {
+                const info = ix.parsed.info;
+                if (info?.destination === recipient) {
+                  isDirect = true;
+                  directAmt = Number((((info.lamports || 0) / LAMPORTS_PER_SOL)).toFixed(4));
+                  sender = info.source;
+                }
+              }
+            }
+          }
+        }
+        if (!isDirect && recipient && tx.transaction?.message?.accountKeys && tx.meta?.postBalances && tx.meta?.preBalances) {
+          const keys = tx.transaction.message.accountKeys.map((k: any) => typeof k === 'string' ? k : k.pubkey?.toBase58?.() || String(k));
+          const recipientIdx = keys.indexOf(recipient);
+          if (recipientIdx !== -1) {
+            const delta = (tx.meta.postBalances[recipientIdx] || 0) - (tx.meta.preBalances[recipientIdx] || 0);
+            if (delta > 0) {
+              isDirect = true;
+              directAmt = Number((delta / LAMPORTS_PER_SOL).toFixed(4));
+            }
+          }
+        }
+
+        return {
+          found: true,
+          isOnChain: true,
+          slot: tx.slot,
+          blockTime: tx.blockTime ?? undefined,
+          status: 'confirmed',
+          network: 'devnet',
+          isDirectRecipientTransfer: isDirect,
+          directTransferAmountSOL: directAmt,
+          senderAddress: sender,
+          isSponsorRelayerProxy: !isDirect,
+          recipientVault: recipient,
+          recipientVaultBalanceSOL: vaultBal,
+          verificationVerdict: isDirect
+            ? `Live On-Chain Transfer Confirmed: ${directAmt} SOL delivered to vault ${recipient}`
+            : `Confirmed Solana Devnet slot #${tx.slot} (Relayer proxy mode)`
+        };
+      }
+
       const status = await connection.getSignatureStatus(txSignature, { searchTransactionHistory: true });
       if (status?.value) {
         return {
@@ -616,18 +717,9 @@ export class SolanaService {
           isOnChain: true,
           slot: status.value.slot,
           status: status.value.confirmationStatus || 'confirmed',
-          network: 'devnet'
-        };
-      }
-      const tx = await connection.getParsedTransaction(txSignature, { commitment: 'confirmed' });
-      if (tx) {
-        return {
-          found: true,
-          isOnChain: true,
-          slot: tx.slot,
-          blockTime: tx.blockTime ?? undefined,
-          status: 'confirmed',
-          network: 'devnet'
+          network: 'devnet',
+          recipientVault: recipient,
+          recipientVaultBalanceSOL: vaultBal
         };
       }
     } catch {}

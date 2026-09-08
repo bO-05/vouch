@@ -570,12 +570,37 @@ export const AidCard: React.FC<AidCardProps> = ({
           border: '1px solid rgba(16, 185, 129, 0.25)',
           color: '#34D399'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
             <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#10B981' }} />
             <span style={{ fontWeight: 700, color: '#F8FAFC' }}>Devnet Slot:</span>
             <span style={{ fontFamily: 'var(--font-mono)', color: '#34D399', fontWeight: 800 }}>
               #{latestGrant.slot || '494513996'}
             </span>
+            {(latestGrant.directOnChainVaultTransfer || latestGrant.relayerMode?.includes('direct')) ? (
+              <span style={{
+                fontSize: '0.62rem',
+                padding: '1px 5px',
+                borderRadius: 4,
+                background: 'rgba(16, 185, 129, 0.15)',
+                color: '#34D399',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                fontWeight: 600
+              }} title="Direct on-chain vault transfer verified">
+                Direct Transfer
+              </span>
+            ) : (
+              <span style={{
+                fontSize: '0.62rem',
+                padding: '1px 5px',
+                borderRadius: 4,
+                background: 'rgba(56, 189, 248, 0.15)',
+                color: '#38BDF8',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                fontWeight: 600
+              }} title="Sponsored Devnet proxy slot anchored in protocol milestone escrow">
+                Relayer Proxy
+              </span>
+            )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <a

@@ -211,6 +211,34 @@ async function runTests() {
     logFail('Solana Live On-Chain Devnet Transaction Verification', err.message);
   }
 
+  // Test 6e: Rejection of Fraudulent / Unconfirmed Transaction Signatures
+  try {
+    const bogusSig = 'InvalidBogusTransactionSignature9999999999999999';
+    const res = await fetch(`${SERVER_BASE}/api/solana/verify-tx/${encodeURIComponent(bogusSig)}`);
+    const data = await res.json();
+    if (res.status === 404 && data.found === false && data.isOnChain === false) {
+      logPass('Reject Fraudulent/Unconfirmed Transaction Signatures', `Correctly returned HTTP 404 with found: false for bogus signature`);
+    } else {
+      throw new Error(`Expected 404 with found: false, got status ${res.status} with body: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('Reject Fraudulent/Unconfirmed Transaction Signatures', err.message);
+  }
+
+  // Test 6f: End-to-End 90 SOL Grant Protocol Escrow & Devnet Proxy Audit
+  try {
+    const targetSig = '3tGucfgZ8Y9PP231GVryy2q9hW8rFGA9RU76ERMmsHgCEzkbKVPykbEQdaaZ6R9jsUgk1zXVjHonWTnbWhZENz2m';
+    const res = await fetch(`${SERVER_BASE}/api/solana/verify-tx/${encodeURIComponent(targetSig)}?recipient=4aoR48sXEwyWEh9eUKzGV536CZzwSocHP5MAsX8WWJvD`);
+    const data = await res.json();
+    if (res.ok && data.isOnChain === true && data.isDirectRecipientTransfer === false && data.isSponsorRelayerProxy === true && data.recipientVault === '4aoR48sXEwyWEh9eUKzGV536CZzwSocHP5MAsX8WWJvD') {
+      logPass('90 SOL Grant Devnet Relayer Proxy & Escrow Verification', `Verified slot #${data.slot}, directTransfer: ${data.isDirectRecipientTransfer}, proxy: ${data.isSponsorRelayerProxy}, vault balance: ${data.recipientVaultBalanceSOL} SOL`);
+    } else {
+      throw new Error(`90 SOL grant verification failed: ${JSON.stringify(data)}`);
+    }
+  } catch (err) {
+    logFail('90 SOL Grant Devnet Relayer Proxy & Escrow Verification', err.message);
+  }
+
   // Test 7: Multimodal Delivery Proof & Escrow Release
   try {
     const proofPayload = {

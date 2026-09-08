@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 import { X, Heart, ExternalLink, ShieldCheck, Check, Sparkles, Loader2, Copy, QrCode, Info, AlertTriangle, Bolt } from './Icons';
-import { SolanaService, WalletState, PROTOCOL_ESCROW_VAULT } from '../services/solanaService';
+import { SolanaService, WalletState, PROTOCOL_ESCROW_VAULT, VerificationDetail } from '../services/solanaService';
 import { AidRequest, MicroGrant, SolanaPriceData } from '../types';
 import { ACTIVE_BRAND } from '../config/branding';
 
@@ -41,15 +41,7 @@ export const MicroGrantModal: React.FC<MicroGrantModalProps> = ({
 
   // On-Chain RPC Verification States
   const [isVerifyingRpc, setIsVerifyingRpc] = useState<boolean>(false);
-  const [rpcVerificationResult, setRpcVerificationResult] = useState<{
-    found: boolean;
-    isOnChain: boolean;
-    slot?: number;
-    blockTime?: number;
-    status: string;
-    network: string;
-    simulationReason?: string;
-  } | null>(null);
+  const [rpcVerificationResult, setRpcVerificationResult] = useState<VerificationDetail | null>(null);
   const [copiedSig, setCopiedSig] = useState<boolean>(false);
   const [copiedRecipient, setCopiedRecipient] = useState<boolean>(false);
 
@@ -169,7 +161,10 @@ export const MicroGrantModal: React.FC<MicroGrantModalProps> = ({
     if (!completedGrant) return;
     setIsVerifyingRpc(true);
     try {
-      const result = await SolanaService.verifyTransaction(completedGrant.txSignature);
+      const result = await SolanaService.verifyTransaction(
+        completedGrant.txSignature,
+        completedGrant.recipientWallet || recipientAddress
+      );
       setRpcVerificationResult(result);
     } catch (err) {
       console.error('Error verifying transaction:', err);
@@ -340,11 +335,13 @@ export const MicroGrantModal: React.FC<MicroGrantModalProps> = ({
                   padding: '3px 10px',
                   borderRadius: 'var(--radius-full)',
                   fontWeight: 700,
-                  background: completedGrant.isOnChain ? 'rgba(20, 241, 149, 0.15)' : 'rgba(56, 189, 248, 0.15)',
-                  color: completedGrant.isOnChain ? '#14F195' : '#38BDF8',
-                  border: `1px solid ${completedGrant.isOnChain ? 'rgba(20, 241, 149, 0.4)' : 'rgba(56, 189, 248, 0.4)'}`
+                  background: (completedGrant.directOnChainVaultTransfer || completedGrant.relayerMode === 'direct-wallet-broadcast') ? 'rgba(20, 241, 149, 0.15)' : 'rgba(56, 189, 248, 0.15)',
+                  color: (completedGrant.directOnChainVaultTransfer || completedGrant.relayerMode === 'direct-wallet-broadcast') ? '#14F195' : '#38BDF8',
+                  border: `1px solid ${(completedGrant.directOnChainVaultTransfer || completedGrant.relayerMode === 'direct-wallet-broadcast') ? 'rgba(20, 241, 149, 0.4)' : 'rgba(56, 189, 248, 0.4)'}`
                 }}>
-                  {completedGrant.isOnChain ? 'Confirmed On-Chain Devnet' : 'Verified Sandbox Simulation'}
+                  {(completedGrant.directOnChainVaultTransfer || completedGrant.relayerMode === 'direct-wallet-broadcast')
+                    ? 'Confirmed Direct On-Chain Vault Transfer'
+                    : '⚡ Sponsored Devnet Relayer Slot (Milestone Escrow)'}
                 </span>
               </div>
               <h3 style={{ fontSize: '1.35rem', fontWeight: 800 }} className="gradient-text-solana">
@@ -525,20 +522,41 @@ export const MicroGrantModal: React.FC<MicroGrantModalProps> = ({
                     padding: '8px 10px',
                     borderRadius: 6,
                     fontSize: '0.72rem',
-                    background: rpcVerificationResult.isOnChain ? 'rgba(20, 241, 149, 0.1)' : 'rgba(56, 189, 248, 0.1)',
-                    border: `1px solid ${rpcVerificationResult.isOnChain ? 'rgba(20, 241, 149, 0.3)' : 'rgba(56, 189, 248, 0.3)'}`,
-                    color: rpcVerificationResult.isOnChain ? '#14F195' : '#38BDF8'
+                    background: (!rpcVerificationResult.found || !rpcVerificationResult.isOnChain)
+                      ? 'rgba(239, 68, 68, 0.1)'
+                      : (rpcVerificationResult.isDirectRecipientTransfer ? 'rgba(20, 241, 149, 0.1)' : 'rgba(56, 189, 248, 0.1)'),
+                    border: `1px solid ${(!rpcVerificationResult.found || !rpcVerificationResult.isOnChain)
+                      ? 'rgba(239, 68, 68, 0.3)'
+                      : (rpcVerificationResult.isDirectRecipientTransfer ? 'rgba(20, 241, 149, 0.3)' : 'rgba(56, 189, 248, 0.3)')}`,
+                    color: (!rpcVerificationResult.found || !rpcVerificationResult.isOnChain)
+                      ? '#F87171'
+                      : (rpcVerificationResult.isDirectRecipientTransfer ? '#14F195' : '#38BDF8'),
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4
                   }}>
-                    {rpcVerificationResult.isOnChain ? (
+                    {(!rpcVerificationResult.found || !rpcVerificationResult.isOnChain) ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <Check size={12} color="#14F195" />
-                        <span><strong>On-Chain Devnet Verified:</strong> Transaction confirmed at slot #{rpcVerificationResult.slot} on cluster '{rpcVerificationResult.network}'.</span>
+                        <AlertTriangle size={12} color="#F87171" />
+                        <span><strong>Verification Notice:</strong> Transaction signature was not found on Solana Devnet or protocol registry.</span>
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <Check size={12} color="#38BDF8" />
-                        <span><strong>Audit Record Verified:</strong> Status '{rpcVerificationResult.status}'. {rpcVerificationResult.simulationReason || 'Confirmed in local verifiable audit trail.'}</span>
-                      </div>
+                      <>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <Check size={12} color={rpcVerificationResult.isDirectRecipientTransfer ? '#14F195' : '#38BDF8'} />
+                          <span><strong>{rpcVerificationResult.isDirectRecipientTransfer ? 'Direct On-Chain Transfer Verified:' : 'Devnet Slot Verified:'}</strong> {rpcVerificationResult.verificationVerdict || `Transaction confirmed at slot #${rpcVerificationResult.slot} on cluster '${rpcVerificationResult.network}'.`}</span>
+                        </div>
+                        {rpcVerificationResult.recipientVaultBalanceSOL !== undefined && (
+                          <div style={{ fontSize: '0.68rem', color: '#94A3B8', paddingLeft: 18 }}>
+                            Live Devnet Vault Balance: <strong style={{ color: '#E2E8F0' }}>{rpcVerificationResult.recipientVaultBalanceSOL} SOL</strong> · Escrow State: <strong style={{ color: rpcVerificationResult.isEscrowLocked ? '#FBBF24' : '#14F195' }}>{rpcVerificationResult.isEscrowLocked ? 'Milestone Escrow Locked' : 'Escrow Released'}</strong>
+                          </div>
+                        )}
+                        {rpcVerificationResult.isSponsorRelayerProxy && (
+                          <div style={{ fontSize: '0.68rem', color: '#CBD5E1', paddingLeft: 18, fontStyle: 'italic', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: 4, marginTop: 2 }}>
+                            💡 Zero-Wallet Sponsor Mode: Transaction verified at Devnet slot #{rpcVerificationResult.slot}. Pledged grant ({completedGrant.amountSOL} SOL) is securely anchored in protocol milestone escrow until delivery proof verification. Connect a funded Phantom wallet for direct vault-to-vault transfers.
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
@@ -562,7 +580,7 @@ export const MicroGrantModal: React.FC<MicroGrantModalProps> = ({
                 <span>Zero-Friction Evaluator Mode Active</span>
               </div>
               <div>
-                This micro-grant was confirmed on <strong>Solana Devnet</strong> via {completedGrant.relayerMode?.includes('direct') ? 'the persistent backend authority keypair' : 'Vouch Gasless Sponsor Relayer'}. Hackathon judges do <strong>not</strong> need Phantom or Devnet SOL tokens to evaluate live on-chain functionality.
+                This micro-grant was confirmed on <strong>Solana Devnet</strong> via {completedGrant.relayerMode?.includes('direct') ? 'the persistent backend authority keypair' : 'Vouch Gasless Sponsor Relayer'}. {completedGrant.relayerNote ? <div style={{ marginTop: 4, color: '#CBD5E1' }}>{completedGrant.relayerNote}</div> : null}
               </div>
             </div>
 

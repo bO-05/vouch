@@ -197,6 +197,9 @@ export interface MicroGrant {
   sponsorBadge?: string;
   sponsorRole?: string;
   zeroWalletRequiredForJudges?: boolean;
+  recipientVaultBalanceSOL?: number;
+  directOnChainVaultTransfer?: boolean;
+  relayerNote?: string;
   explorerUrl?: string;
   solscanUrl?: string;
 }
